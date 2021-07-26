@@ -8,7 +8,7 @@ Configuration FSLProperties
         Registry FSLPropertiesReg-Enabled
         {
             Ensure = 'Present'
-            Key = 'Computer\HKEY_LOCAL_MACHINE\SOFTWARE\FSLogix\Profiles'
+            Key = 'HKLM:\SOFTWARE\FSLogix\Profiles'
             ValueName = 'Enabled'
             ValueType = 'Dword'
             ValueData = '1'
@@ -16,7 +16,7 @@ Configuration FSLProperties
         Registry FSLPropertiesReg-DeleteLocalProfileWhenVHDShouldApply
         {
             Ensure = 'Present'
-            Key = 'Computer\HKEY_LOCAL_MACHINE\SOFTWARE\FSLogix\Profiles'
+            Key = 'HKLM:\SOFTWARE\FSLogix\Profiles'
             ValueName = 'DeleteLocalProfileWhenVHDShouldApply'
             ValueType = 'Dword'
             ValueData = '1'
@@ -24,7 +24,7 @@ Configuration FSLProperties
         Registry FSLPropertiesReg-FlipFlopProfileDirectoryName
         {
             Ensure = 'Present'
-            Key = 'Computer\HKEY_LOCAL_MACHINE\SOFTWARE\FSLogix\Profiles'
+            Key = 'HKLM:\SOFTWARE\FSLogix\Profiles'
             ValueName = 'FlipFlopProfileDirectoryName'
             ValueType = 'Dword'
             ValueData = '1'
@@ -32,7 +32,7 @@ Configuration FSLProperties
         Registry FSLPropertiesReg-IsDynamic
         {
             Ensure = 'Present'
-            Key = 'Computer\HKEY_LOCAL_MACHINE\SOFTWARE\FSLogix\Profiles'
+            Key = 'HKLM:\SOFTWARE\FSLogix\Profiles'
             ValueName = 'IsDynamic'
             ValueType = 'Dword'
             ValueData = '1'
@@ -40,7 +40,7 @@ Configuration FSLProperties
         Registry FSLPropertiesReg-PreventLoginWithTempProfile
         {
             Ensure = 'Present'
-            Key = 'Computer\HKEY_LOCAL_MACHINE\SOFTWARE\FSLogix\Profiles'
+            Key = 'HKLM:\SOFTWARE\FSLogix\Profiles'
             ValueName = 'PreventLoginWithTempProfile'
             ValueType = 'Dword'
             ValueData = '1'
@@ -48,7 +48,7 @@ Configuration FSLProperties
         Registry FSLPropertiesReg-ProfileType
         {
             Ensure = 'Present'
-            Key = 'Computer\HKEY_LOCAL_MACHINE\SOFTWARE\FSLogix\Profiles'
+            Key = 'HKLM:\SOFTWARE\FSLogix\Profiles'
             ValueName = 'ProfileType'
             ValueType = 'Dword'
             ValueData = '0'
@@ -56,7 +56,7 @@ Configuration FSLProperties
         Registry FSLPropertiesReg-SizeInMBs
         {
             Ensure = 'Present'
-            Key = 'Computer\HKEY_LOCAL_MACHINE\SOFTWARE\FSLogix\Profiles'
+            Key = 'HKLM:\SOFTWARE\FSLogix\Profiles'
             ValueName = 'SizeInMBs'
             ValueType = 'Dword'
             ValueData = '100000'
@@ -64,7 +64,7 @@ Configuration FSLProperties
         Registry FSLPropertiesReg-VolumeType
         {
             Ensure = 'Present'
-            Key = 'Computer\HKEY_LOCAL_MACHINE\SOFTWARE\FSLogix\Profiles'
+            Key = 'HKLM:\SOFTWARE\FSLogix\Profiles'
             ValueName = 'VolumeType'
             ValueType = 'String'
             ValueData = 'VHDX'
@@ -72,10 +72,12 @@ Configuration FSLProperties
         Registry FSLPropertiesReg-VHDLocations
         {
             Ensure = 'Present'
-            Key = 'Computer\HKEY_LOCAL_MACHINE\SOFTWARE\FSLogix\Profiles'
+            Key = 'HKLM:\SOFTWARE\FSLogix\Profiles'
             ValueName = 'VHDLocations'
             ValueType = 'MultiString'
             ValueData = $VHDLocations
         }
     }
 }
+
+FSLProperties -output .\
