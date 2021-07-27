@@ -79,5 +79,3 @@ Configuration FSLProperties
         }
     }
 }
-
-FSLProperties -output .\
