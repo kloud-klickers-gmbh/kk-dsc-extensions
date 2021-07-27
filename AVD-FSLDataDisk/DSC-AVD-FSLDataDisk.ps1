@@ -25,6 +25,7 @@ Configuration FSLDataDisk
 
         NTFSAccessEntry AccessVolumeF
         {
+            Force = $true
             DependsOn = '[xDisk]FVolume'
             Path = "F:\"
             AccessControlList = @(
