@@ -4,7 +4,7 @@ Configuration FSLDataDisk
         [int]$DiskNumber = 2
     )
     Import-DSCResource -ModuleName xStorage
-    Import-DscResource -ModuleName AccessControlDSC
+    Import-DscResource -ModuleName cNtfsAccessControl
     Node localhost
     {
         xWaitforDisk Disk2
@@ -23,26 +23,20 @@ Configuration FSLDataDisk
             FSLabel = 'FSLProfiles'
         }
 
-        NTFSAccessEntry AccessVolumeF
+        cNtfsPermissionEntry AllowUsersVolF
         {
-            Force = $true
             DependsOn = '[xDisk]FVolume'
+            Ensure = 'Present'
             Path = "F:\"
-            AccessControlList = @(
-                NTFSAccessControlList
+            Principal = "Users"
+            AccessControlInformation = @(
+                cNTFSAccessControlInformation
                 {
-                    Principal = "Users"
-                    AccessControlEntry = @(
-                        NTFSAccessControlEntry
-                        {
-                            AccessControlType = 'Allow'
-                            FileSystemRights = 'Modify'
-                            Inheritance = 'This folder subfolders and files'
-                            Ensure = 'Present'
-                        }
-                    )               
-                } 
+                    AccessControlType = 'Allow'
+                    FileSystemRights = 'Modify'
+                }
             )
-        }        
+        }
+          
     }
 }
