@@ -25,7 +25,7 @@ Configuration FSLDataDisk
 
         NTFSAccessEntry AccessVolumeF
         {
-            DependsOn = FVolume
+            DependsOn = '[xDisk]FVolume'
             Path = "F:\"
             AccessControlList = @(
                 NTFSAccessControlList
