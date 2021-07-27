@@ -1,4 +1,4 @@
-Configuration FSLDataDisk
+Configuration FSLExclusionAdmins
 {
     Node localhost
     {
