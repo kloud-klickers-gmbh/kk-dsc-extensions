@@ -121,8 +121,8 @@ Configuration PrepareHost
                 Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" -OutFile "C:\AVD\AVD-Agent.msi"
                 Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH" -OutFile "C:\AVD\AVD-Bootloader.msi"
                 Remove-Variable ProgressPreference -Force
-                Start-Process -wait "C:\WVD\WVD-Agent.msi" -ArgumentList "/q RegistrationToken=$($using:registration)"
-                Start-Process -wait "C:\WVD\WVD-Bootloader.msi" -ArgumentList "/q"
+                Start-Process -wait "C:\AVD\AVD-Agent.msi" -ArgumentList "/q RegistrationToken=$($using:registration)"
+                Start-Process -wait "C:\AVD\AVD-Bootloader.msi" -ArgumentList "/q"
             }
             TestScript = {
                 try {
