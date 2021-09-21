@@ -134,7 +134,7 @@ Configuration PrepareHost
             }
         }
         Script JoinDomain{
-            DependsOn = 'InstallAVDAdgent'
+            DependsOn = '[Script]InstallAVDAdgent'
             GetScript = {
                 GetScript = {
                     return @{'Result' = ''}
