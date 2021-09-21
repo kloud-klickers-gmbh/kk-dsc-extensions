@@ -135,7 +135,6 @@ Configuration PrepareHost
             }
         }
         xDSCDomainjoin JoinDomain{
-            DependsOn = '[Script]InstallAVDAdgent'
             Domain = $joindomain
             JoinOU = $joinou
             Credential = $JoinCredential
