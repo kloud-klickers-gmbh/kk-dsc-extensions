@@ -11,6 +11,7 @@ Configuration PrepareHost
         [System.Management.Automation.PSCredential]$JoinCredential
     )
     
+    Import-DscResource -ModuleName 'xDSCDomainjoin'
 
     Node localhost
     {
@@ -133,35 +134,11 @@ Configuration PrepareHost
                 }
             }
         }
-        Script JoinDomain{
+        xDSCDomainjoin JoinDomain{
             DependsOn = '[Script]InstallAVDAdgent'
-            GetScript = {
-                GetScript = {
-                    return @{'Result' = ''}
-                }
-            }
-            SetScript = {
-                if($joinou -ne ""){
-                    Add-Computer -domainname $using:joindomain -OUPath $using:joinou -credential $using:joincredential -force
-                }
-                else {
-                    Add-Computer -domainname $using:joindomain -credential $using:joincredential -force
-                }
-            }
-            TestScript = {
-                if((Get-WmiObject -Class Win32_ComputerSystem).partofdomain -eq $true){
-                    if((Get-WmiObject -Class Win32_ComputerSystem).domain -match $using:joindomain){
-                        Write-Output "Part of domain: $($using:joindomain)"
-                        return $true
-                    }else{
-                        Write-Output "Not part of domain: $($using:joindomain)"
-                        return $false
-                    }
-                }else{
-                    Write-Output "Not domain joined"
-                    return $false
-                }
-            }
+            Domain = $joindomain
+            JoinOU = $joinou
+            Credential = $JoinCredential
         }
     }
 }
