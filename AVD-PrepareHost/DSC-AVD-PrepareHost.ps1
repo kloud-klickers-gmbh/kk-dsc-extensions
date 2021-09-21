@@ -1,4 +1,4 @@
-Configuration FSLProperties
+Configuration PrepareHost
 {
     param(
         [string[]]$VHDLocations,
