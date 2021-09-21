@@ -104,8 +104,14 @@ Configuration PrepareHost
                 Members = $IncludedMembers
             }
         }
+        xDSCDomainjoin JoinDomain{
+            Domain = $joindomain
+            JoinOU = $joinou
+            Credential = $JoinCredential
+        }
         xPowerShellExecutionPolicy UnrestrictedExePol
         {
+            DependsOn = '[xDSCDomainjoin]JoinDomain'
             ExecutionPolicy = 'Unrestricted'
         }
         Script InstallAVDAdgent{
@@ -127,14 +133,8 @@ Configuration PrepareHost
             TestScript = {
                 try {
                     $rdInfraAgentRegistryPath = "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\RDInfraAgent"
-                    
-                    if (Test-path $rdInfraAgentRegistryPath) {
-                        $regTokenProperties = Get-ItemProperty -Path $rdInfraAgentRegistryPath -Name "RegistrationToken"
-                        $isRegisteredProperties = Get-ItemProperty -Path $rdInfraAgentRegistryPath -Name "IsRegistered"
-                        return ($regTokenProperties.RegistrationToken -eq "") -and ($isRegisteredProperties.isRegistered -eq 1)
-                    } else {
-                        return $false;
-                    }
+                    $regTokenProperties = Get-ItemProperty -Path $rdInfraAgentRegistryPath -Name "RegistrationToken"
+                    return ($regTokenProperties.RegistrationToken -eq "")
                 }
                 catch {
                     $ErrMsg = $PSItem | Format-List -Force | Out-String
@@ -142,11 +142,6 @@ Configuration PrepareHost
                 }
             }
         }
-        xDSCDomainjoin JoinDomain{
-            DependsOn = '[Script]InstallAVDAdgent'
-            Domain = $joindomain
-            JoinOU = $joinou
-            Credential = $JoinCredential
-        }
+        
     }
 }
