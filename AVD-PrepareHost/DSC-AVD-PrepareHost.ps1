@@ -8,10 +8,9 @@ Configuration PrepareHost
         [string]$registration,
         [string]$joinou,
         [string]$joindomain,
-        [string]$joinuser,
-        [securestring]$joinpassword
+        [System.Management.Automation.PSCredential]$JoinCredential
     )
-    $JoinCredential = New-Object System.Management.Automation.PSCredential($joinuser,$joinpassword)
+    
 
     Node localhost
     {
