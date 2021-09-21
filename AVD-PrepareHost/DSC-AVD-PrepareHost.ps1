@@ -12,6 +12,7 @@ Configuration PrepareHost
     )
     
     Import-DscResource -ModuleName 'xDSCDomainjoin'
+    Import-DscResource -ModuleName 'xPowerShellExecutionPolicy'
 
     Node localhost
     {
@@ -87,27 +88,34 @@ Configuration PrepareHost
             ValueType = 'MultiString'
             ValueData = $VHDLocations
         }
-        Group FSLogixExclude
-        {
-            GroupName = "FSLogix Profile Exclude List"
-            Ensure = 'Present'
-            MembersToInclude = $ExcludedMembers
+        if ($null -ne $ExcludedMembers) {
+            Group FSLogixExclude
+            {
+                GroupName = "FSLogix Profile Exclude List"
+                Ensure = 'Present'
+                MembersToInclude = $ExcludedMembers
+            }
         }
-        Group FSLogixInclude
+        if ($null -ne $IncludedMembers) {
+            Group FSLogixInclude
+            {
+                GroupName = "FSLogix Profile Include List"
+                Ensure = 'Present'
+                Members = $IncludedMembers
+            }
+        }
+        xPowerShellExecutionPolicy UnrestrictedExePol
         {
-            GroupName = "FSLogix Profile Include List"
-            Ensure = 'Present'
-            Members = $IncludedMembers
+            ExecutionPolicy = 'Unrestricted'
         }
         Script InstallAVDAdgent{
-
+            DependsOn = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
             GetScript = {
                 return @{'Result' = ''}
             }
             SetScript = {
                 New-Item -Path "C:\" -Name "Temp" -ItemType "directory"
                 Start-Transcript -Path "C:\Temp\wvdprep.log.txt" -Verbose -Force
-                Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
                 New-Item -Path "C:\" -Name "AVD" -ItemType "directory"
                 $ProgressPreference = 'SilentlyContinue'
                 Invoke-WebRequest -Uri "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv" -OutFile "C:\AVD\AVD-Agent.msi"
@@ -135,6 +143,7 @@ Configuration PrepareHost
             }
         }
         xDSCDomainjoin JoinDomain{
+            DependsOn = '[Script]InstallAVDAdgent'
             Domain = $joindomain
             JoinOU = $joinou
             Credential = $JoinCredential
