@@ -2,8 +2,6 @@ Configuration PrepareHost
 {
     param(
         [string[]]$VHDLocations,
-        [string[]]$ExcludedMembers,
-        [string[]]$IncludedMembers,
         [int]$ProfileSizeMB,
         [string]$registration,
         [string]$joinou,
@@ -229,26 +227,5 @@ Configuration PrepareHost
             ValueType = 'MultiString'
             ValueData = $VHDLocations
         }
-        if ($null -ne $ExcludedMembers) {
-            Group FSLogixExclude
-            {
-                DependsOn = '[xPendingReboot]RebootDomJoin'
-                GroupName = "FSLogix Profile Exclude List"
-                Ensure = 'Present'
-                MembersToInclude = $ExcludedMembers
-            }
-        }
-        if ($null -ne $IncludedMembers) {
-            Group FSLogixInclude
-            {
-                DependsOn = '[xPendingReboot]RebootDomJoin'
-                GroupName = "FSLogix Profile Include List"
-                Ensure = 'Present'
-                Members = $IncludedMembers
-            }
-        }        
-        
-        
-        
     }
 }
