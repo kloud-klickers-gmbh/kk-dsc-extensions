@@ -21,7 +21,7 @@ Configuration PrepareHost
             Name = 'Firstboot'
         }
         LocalConfigurationManager{
-            RebootNodeIfNeeded = 'True'
+            RebootNodeIfNeeded = $true
         }
         xPowerShellExecutionPolicy UnrestrictedExePol
         {
@@ -146,7 +146,7 @@ Configuration PrepareHost
             DependsOn = '[xDSCDomainjoin]JoinDomain'
         }
         LocalConfigurationManager{
-            RebootNodeIfNeeded = 'True'
+            RebootNodeIfNeeded = $true
         }
         Registry FSLPropertiesReg-Enabled
         {
