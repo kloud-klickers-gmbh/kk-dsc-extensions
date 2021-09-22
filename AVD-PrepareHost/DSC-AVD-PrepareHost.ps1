@@ -6,6 +6,7 @@ Configuration PrepareHost
         [string]$registration,
         [string]$joinou,
         [string]$joindomain,
+        [string[]]$FSLExcludedMembers,
         [System.Management.Automation.PSCredential]$JoinCredential
     )
     
@@ -226,6 +227,12 @@ Configuration PrepareHost
             ValueName = 'VHDLocations'
             ValueType = 'MultiString'
             ValueData = $VHDLocations
+        }
+        Group FSLExclude{
+            DependsOn = '[xPendingReboot]RebootDomJoin'
+            GroupName = 'FSLogix Profile Exclude List'
+            Ensure = 'Present'
+            MembersToInclude = $FSLExcludedMembers
         }
     }
 }
