@@ -25,7 +25,7 @@ Configuration PrepareHost
         }
         xPowerShellExecutionPolicy UnrestrictedExePol
         {
-            DependsOn = '[xDSCDomainjoin]JoinDomain'
+            DependsOn = '[xPendingReboot]FirstBoot'
             ExecutionPolicy = 'Unrestricted'
         }
         Script DownloadAgent
