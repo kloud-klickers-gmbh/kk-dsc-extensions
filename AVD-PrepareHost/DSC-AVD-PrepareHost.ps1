@@ -145,6 +145,9 @@ Configuration PrepareHost
             Name = 'DomJoinReboot'
             DependsOn = '[xDSCDomainjoin]JoinDomain'
         }
+        LocalConfigurationManager{
+            RebootNodeIfNeeded = 'True'
+        }
         Registry FSLPropertiesReg-Enabled
         {
             DependsOn = '[xPendingReboot]RebootDomJoin'
