@@ -10,6 +10,7 @@ Configuration FSLShrink
     $TaskStartTime = ([DateTime]::Today).AddHours($ScheduleHours).AddMinutes($ScheduleMinutes)
     Import-DSCResource -ModuleName 'ComputerManagementDSC'
     Import-DscResource -ModuleName 'xPowerShellExecutionPolicy'
+    Import-DscResource -ModuleName 'SecurityPolicyDsc'
     node localhost{
         xPowerShellExecutionPolicy UnrestrictedExePol
         {
@@ -48,9 +49,16 @@ Configuration FSLShrink
                 $Status -eq $True
             }        
         }
-        ScheduledTask FSLShrinkScheduledTask
+        UserRightsAssignment LogonAsBatchJobShrinkUser
         {
             DependsOn = '[Script]DownloadFSLShrink'
+            Policy = 'Log_on_as_a_batch_job'
+            Identity = $ShrinkExecuteCredential.UserName
+            Ensure = 'Present'
+        }
+        ScheduledTask FSLShrinkScheduledTask
+        {
+            DependsOn = '[UserRightsAssignment]LogonAsBatchJobShrinkUser'
             TaskName = 'Daily_FSLShrink'
             Ensure = 'Present'
             ActionExecutable = 'powershell.exe'
