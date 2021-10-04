@@ -22,7 +22,7 @@ Configuration FSLShrink
             UserName = $ShrinkUser
             Password = $ShrinkUserPass
             Ensure = 'Present'
-            PasswordNeverExpires = 'True'
+            PasswordNeverExpires = $True
         }
         Group SchrinkUserAdmin
         {
