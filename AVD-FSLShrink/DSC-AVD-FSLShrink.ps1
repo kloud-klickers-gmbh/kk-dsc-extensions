@@ -3,7 +3,10 @@ Configuration FSLShrink
     param(
         [string]$ProfilesUNCPath,
         [int]$ScheduleHours,
-        [int]$ScheduleMinutes
+        [int]$ScheduleMinutes,
+        [string]$sastarget,
+        [string]$sasuser,
+        [securestring]$saspass
     )
     $TaskArgument = "-file ""C:\Scripts\FSLShrink\Invoke-FslShrinkDisk.ps1"" -Path "+$ProfilesUNCPath+" -Recurse -PassThru -IgnoreLessThanGB 3 -LogFilePath C:\Scripts\FSLShrink\FSLShrinkLog.csv -ThrottleLimit 2 -RatioFreeSpace 0.1"
     $TaskStartTime = ([DateTime]::Today).AddHours($ScheduleHours).AddMinutes($ScheduleMinutes)
