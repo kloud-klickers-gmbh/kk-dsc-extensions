@@ -4,9 +4,9 @@ Configuration FSLShrink
         [string]$ProfilesUNCPath,
         [int]$ScheduleHours,
         [int]$ScheduleMinutes,
-        [string]$sastarget,
-        [string]$sasuser,
-        [string]$saspass,
+        [string]$satarget,
+        [string]$sauser,
+        [string]$sapass,
         [pscredential]$ShrinkUserCred
     )
     $TaskArgument = "-file ""C:\Scripts\FSLShrink\Invoke-FslShrinkDisk.ps1"" -Path "+$ProfilesUNCPath+" -Recurse -PassThru -IgnoreLessThanGB 3 -LogFilePath C:\Scripts\FSLShrink\FSLShrinkLog.csv -ThrottleLimit 2 -RatioFreeSpace 0.1"
