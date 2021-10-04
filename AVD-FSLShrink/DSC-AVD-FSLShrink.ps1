@@ -14,20 +14,6 @@ Configuration FSLShrink
     Import-DscResource -ModuleName 'xPowerShellExecutionPolicy'
     Import-DscResource -ModuleName 'SecurityPolicyDsc'
     node localhost{
-        User LocalShrinkUser
-        {
-            UserName = 'FSLShrink'
-            Password = $ShrinkUserPass
-            Ensure = 'Present'
-            PasswordNeverExpires = 'True'
-        }
-        Group SchrinkUserAdmin
-        {
-            DependsOn = '[User]LocalShrinkUser'
-            GroupName = 'Administrators'
-            MembersToInclude = 'FSLShrink'
-            Ensure = 'Present'
-        }
         xPowerShellExecutionPolicy UnrestrictedExePol
         {
             ExecutionPolicy = 'Unrestricted'
