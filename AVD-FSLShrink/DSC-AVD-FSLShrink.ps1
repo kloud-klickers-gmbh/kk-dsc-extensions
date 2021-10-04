@@ -75,7 +75,7 @@ Configuration FSLShrink
                     GetScript = $GetScript
                     SetScript = $SetScript
                     TestScript = $TestScript
-                    Result = (((cmd /C ("cmdkey `/list:Domain:target="+$($using:sastarget)+"`"")) -match "Keine|None").count -eq 0)
+                    Result = (Test-Path "C:\Scripts\FSLShrink\ShrinkCredential.xml")
                 }
             }
             SetScript = {
@@ -91,14 +91,22 @@ Configuration FSLShrink
                 {
                     Remove-Item -Path "C:\Scripts\FSLShrink\ShrinkCredential.xml" -Force
                 }
+                $saspassstring = [System.Net.NetworkCredential]::new("test",$using:saspass).Password
                 $saspassstring = [System.Net.NetworkCredential]::new("", $using:saspass).Password
                 $argument = "cmdkey /add:`"$($using:sastarget)`" /user:`"$($using:sasuser)`" /pass:`"$($saspassstring)`""
                 cmd.exe /C $argument
+                $saspasssecurestring = $saspassstring | ConvertTo-SecureString -AsPlainText -Force
+                $credobj = New-Object -TypeName PSObject -property @{
+                    sastarget = $using:sastarget
+                    sasuser = $using:sasuser
+                    saspassstring = $saspasssecurestring
+                }
+                $credobj | Export-Clixml -path "C:\Scripts\FSLShrink\ShrinkCredential.xml"
             }
             TestScript = {
-                $Status = (((cmd /C ("cmdkey `/list:Domain:target="+$($using:sastarget)+"`"")) -match "Keine|None").count -eq 0)
+                $Status = (Test-Path "C:\Scripts\FSLShrink\ShrinkCredential.xml")
                 $Status -eq $True
-            }        
+            }
         }        
         ScheduledTask FSLShrinkScheduledTask
         {
