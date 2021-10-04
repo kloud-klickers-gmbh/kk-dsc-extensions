@@ -26,7 +26,7 @@ Configuration FSLShrink
         {
             DependsOn = '[User]LocalShrinkUser'
             GroupName = 'Administrators'
-            MembersToInclude = $ShrinkUser
+            MembersToInclude = $ShrinkUserCred.UserName
             Ensure = 'Present'
         }
         xPowerShellExecutionPolicy UnrestrictedExePol
