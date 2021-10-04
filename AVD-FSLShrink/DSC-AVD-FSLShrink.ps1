@@ -2,7 +2,6 @@ Configuration FSLShrink
 {
     param(
         [string]$ProfilesUNCPath,
-        [PSCredential]$ShrinkExecuteCredential,
         [int]$ScheduleHours,
         [int]$ScheduleMinutes
     )
@@ -12,6 +11,20 @@ Configuration FSLShrink
     Import-DscResource -ModuleName 'xPowerShellExecutionPolicy'
     Import-DscResource -ModuleName 'SecurityPolicyDsc'
     node localhost{
+        User LocalShrinkUser
+        {
+            UserName = 'FSLShrink'
+            Password = $ShrinkUserPass
+            Ensure = 'Present'
+            PasswordNeverExpires = 'True'
+        }
+        Group SchrinkUserAdmin
+        {
+            DependsOn = '[User]LocalShrinkUser'
+            GroupName = 'Administrators'
+            MembersToInclude = 'FSLShrink'
+            Ensure = 'Present'
+        }
         xPowerShellExecutionPolicy UnrestrictedExePol
         {
             ExecutionPolicy = 'Unrestricted'
@@ -49,26 +62,50 @@ Configuration FSLShrink
                 $Status -eq $True
             }        
         }
-        UserRightsAssignment LogonAsBatchJobShrinkUser
+        Script AddSASKey
         {
-            DependsOn = '[Script]DownloadFSLShrink'
-            Policy = 'Log_on_as_a_batch_job'
-            Identity = $ShrinkExecuteCredential.UserName
-            Ensure = 'Present'
-        }
+            DependsOn = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
+            GetScript = {
+                @{
+                    GetScript = $GetScript
+                    SetScript = $SetScript
+                    TestScript = $TestScript
+                    Result = (((cmd /C ("cmdkey `/list:Domain:target="+$($using:sastarget)+"`"")) -match "Keine|None").count -eq 0)
+                }
+            }
+            SetScript = {
+                if(!(test-path "c:\Scripts\"))
+                {
+                    New-Item -Path "C:\" -Name "Scripts" -ItemType "directory"
+                }
+                if(!(test-path "C:\Scripts\FSLShrink\"))
+                {
+                    New-Item -Path "C:\Scripts\" -Name "FSLShrink" -ItemType "directory"
+                }
+                if((Test-Path "C:\Scripts\FSLShrink\ShrinkCredential.xml"))
+                {
+                    Remove-Item -Path "C:\Scripts\FSLShrink\ShrinkCredential.xml" -Force
+                }
+                $argument = "cmdkey /add:`"$($using:sastarget)`" /user:`"$($using:sasuser)`" /pass:`"$($using:saspass)`""
+                cmd.exe /C $argument
+            }
+            TestScript = {
+                $Status = (((cmd /C ("cmdkey `/list:Domain:target="+$($using:sastarget)+"`"")) -match "Keine|None").count -eq 0)
+                $Status -eq $True
+            }        
+        }        
         ScheduledTask FSLShrinkScheduledTask
         {
-            DependsOn = '[UserRightsAssignment]LogonAsBatchJobShrinkUser'
+            DependsOn = '[Script]AddSASKey'
             TaskName = 'Daily_FSLShrink'
             Ensure = 'Present'
             ActionExecutable = 'powershell.exe'
             ActionArguments = $TaskArgument
-            ExecuteAsCredential = $ShrinkExecuteCredential
             ActionWorkingPath = 'C:\Scripts\FSLShrink\'
             ScheduleType = 'Daily'
             StartTime = $TaskStartTime
             RunLevel = 'Highest'
-            LogonType = 'Password'
+            BuiltInAccount = 'SYSTEM'
         }
     }
 }
