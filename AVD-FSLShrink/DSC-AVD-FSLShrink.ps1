@@ -6,7 +6,10 @@ Configuration FSLShrink
         [int]$ScheduleMinutes,
         [string]$sastarget,
         [string]$sasuser,
-        [securestring]$saspass
+        [securestring]$saspass,
+        [pscredential]$ShrinkUserCred,
+        [String]$ShrinkUser,
+        [securestring]$ShrinkUserPass
     )
     $TaskArgument = "-file ""C:\Scripts\FSLShrink\Invoke-FslShrinkDisk.ps1"" -Path "+$ProfilesUNCPath+" -Recurse -PassThru -IgnoreLessThanGB 3 -LogFilePath C:\Scripts\FSLShrink\FSLShrinkLog.csv -ThrottleLimit 2 -RatioFreeSpace 0.1"
     $TaskStartTime = ([DateTime]::Today).AddHours($ScheduleHours).AddMinutes($ScheduleMinutes)
@@ -14,6 +17,20 @@ Configuration FSLShrink
     Import-DscResource -ModuleName 'xPowerShellExecutionPolicy'
     Import-DscResource -ModuleName 'SecurityPolicyDsc'
     node localhost{
+        User LocalShrinkUser
+        {
+            UserName = $ShrinkUser
+            Password = $ShrinkUserPass
+            Ensure = 'Present'
+            PasswordNeverExpires = 'True'
+        }
+        Group SchrinkUserAdmin
+        {
+            DependsOn = '[User]LocalShrinkUser'
+            GroupName = 'Administrators'
+            MembersToInclude = $ShrinkUser
+            Ensure = 'Present'
+        }
         xPowerShellExecutionPolicy UnrestrictedExePol
         {
             ExecutionPolicy = 'Unrestricted'
@@ -53,7 +70,8 @@ Configuration FSLShrink
         }
         Script AddSASKey
         {
-            DependsOn = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
+            DependsOn = @('[xPowerShellExecutionPolicy]UnrestrictedExePol','[Group]SchrinkUserAdmin')
+            PsDscRunAsCredential = $ShrinkUserCred
             GetScript = {
                 @{
                     GetScript = $GetScript
@@ -95,7 +113,8 @@ Configuration FSLShrink
             ScheduleType = 'Daily'
             StartTime = $TaskStartTime
             RunLevel = 'Highest'
-            BuiltInAccount = 'SYSTEM'
+            ExecuteAsCredential = $ShrinkUserCred
+            LogonType = 'Password'
         }
     }
 }
