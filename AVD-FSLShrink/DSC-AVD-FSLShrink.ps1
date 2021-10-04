@@ -6,12 +6,9 @@ Configuration FSLShrink
         [int]$ScheduleMinutes,
         [string]$sastarget,
         [string]$sasuser,
-        [securestring]$saspass
+        [securestring]$saspass,
+        [pscredential]$ShrinkUserCred
     )
-    $ShrinkUser = "FSLShrink"
-    $PassGen =  "!@#$%^&*0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz".tochararray()
-    $ShrinkUserPass = (($PassGen | get-random -Count 20) -join "" | ConvertTo-SecureString -asplaintext -force)
-    $ShrinkUserCred = [pscredential]::new($ShrinkUser, ($ShrinkUserPass | ConvertTo-SecureString -AsPlainText -Force))
     $TaskArgument = "-file ""C:\Scripts\FSLShrink\Invoke-FslShrinkDisk.ps1"" -Path "+$ProfilesUNCPath+" -Recurse -PassThru -IgnoreLessThanGB 3 -LogFilePath C:\Scripts\FSLShrink\FSLShrinkLog.csv -ThrottleLimit 2 -RatioFreeSpace 0.1"
     $TaskStartTime = ([DateTime]::Today).AddHours($ScheduleHours).AddMinutes($ScheduleMinutes)
     Import-DSCResource -ModuleName 'ComputerManagementDSC'
@@ -20,8 +17,8 @@ Configuration FSLShrink
     node localhost{
         User LocalShrinkUser
         {
-            UserName = $ShrinkUser
-            Password = $ShrinkUserPass
+            UserName = $ShrinkUserCred.UserName
+            Password = $ShrinkUserCred
             Ensure = 'Present'
             PasswordNeverExpires = $True
         }
@@ -72,7 +69,7 @@ Configuration FSLShrink
         Script AddSASKey
         {
             DependsOn = @('[xPowerShellExecutionPolicy]UnrestrictedExePol','[Group]SchrinkUserAdmin')
-            
+            PsDscRunAsCredential = $ShrinkUserCred
             GetScript = {
                 @{
                     GetScript = $GetScript
