@@ -89,7 +89,8 @@ Configuration FSLShrink
                 {
                     Remove-Item -Path "C:\Scripts\FSLShrink\ShrinkCredential.xml" -Force
                 }
-                $argument = "cmdkey /add:`"$($using:sastarget)`" /user:`"$($using:sasuser)`" /pass:`"$($using:saspass)`""
+                $saspassstring = [System.Net.NetworkCredential]::new("", $using:saspass).Password
+                $argument = "cmdkey /add:`"$($using:sastarget)`" /user:`"$($using:sasuser)`" /pass:`"$($saspassstring)`""
                 cmd.exe /C $argument
             }
             TestScript = {
