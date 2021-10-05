@@ -91,8 +91,7 @@ Configuration FSLShrink
                 {
                     Remove-Item -Path "C:\Scripts\FSLShrink\ShrinkCredential.xml" -Force
                 }
-                $argument = "cmdkey /add:`"$($using:sastarget)`" /user:`"$($using:sasuser)`" /pass:`"$($using:saspass)`""
-                $argument | Set-content -Path "C:\Scripts\FSLShrink\ShrinkCredential.xml"
+                $argument = "cmdkey /add:`"$($using:satarget)`" /user:`"$($using:sauser)`" /pass:`"$($using:sapass)`""
                 cmd.exe /C $argument
             }
             TestScript = {
