@@ -108,7 +108,7 @@ Configuration FSLShrink
                     GetScript = $GetScript
                     SetScript = $SetScript
                     TestScript = $TestScript
-                    Result = ((Compare-Object $using:ProfilesUNCPaths (Import-Clixml C:\Scripts\FSLShrink\vhdlocations.xml)).count -eq 0)
+                    Result = (if(test-path C:\Scripts\FSLShrink\vhdlocations.xml){(Compare-Object $using:ProfilesUNCPaths (Import-Clixml C:\Scripts\FSLShrink\vhdlocations.xml)).count -eq 0}else{$false})
                 }
             }
             SetScript = {
@@ -123,7 +123,7 @@ Configuration FSLShrink
                 $using:ProfilesUNCPaths | export-clixml -Path "C:\Scripts\FSLShrink\vhdlocations.xml"
             }
             TestScript = {
-                $Status = ((Compare-Object $using:ProfilesUNCPaths (Import-Clixml C:\Scripts\FSLShrink\vhdlocations.xml)).count -eq 0)
+                $Status = (if(test-path C:\Scripts\FSLShrink\vhdlocations.xml){(Compare-Object $using:ProfilesUNCPaths (Import-Clixml C:\Scripts\FSLShrink\vhdlocations.xml)).count -eq 0}else{$false})
                 $Status -eq $True
             }        
         }        
