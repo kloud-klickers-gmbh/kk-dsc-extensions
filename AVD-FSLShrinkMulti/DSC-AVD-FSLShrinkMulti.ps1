@@ -1,12 +1,6 @@
 Configuration FSLShrink
 {
 
-    $FileName = "C:\Scripts\FSLShrink\Invoke-FslShrinkDisk.ps1"
-
-    if (Test-Path $FileName) {
-        Remove-Item $FileName
-    }
-
     param(
         [string[]]$ProfilesUNCPaths,
         [int]$ScheduleHours,
