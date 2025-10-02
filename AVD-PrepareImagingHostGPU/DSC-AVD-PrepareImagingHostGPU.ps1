@@ -154,5 +154,14 @@ Configuration PrepareHost
             ValueType = 'Dword'
             ValueData = '1'
         }
+        Registry RDSPol-FPS60
+        {
+            DependsOn = '[xPendingReboot]RebootDomJoin'
+            Ensure = 'Present'
+            Key = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations'
+            ValueName = 'DWMFRAMEINTERVAL'
+            ValueType = 'Dword'
+            ValueData = '15'
+        }
     }
 }
