@@ -368,9 +368,6 @@ Configuration PrepareAvdHost
             ExecutionPolicy = 'Unrestricted'
         }
 
-        Write-Host "AvdRegistrationToken: \"$AvdRegistrationToken\""
-
-        
         if ($null -ne $AvdRegistrationToken -and $AvdRegistrationToken.Length -gt 10) {
             InstallAVDAgent InstallAVDAgent {
                 AvdRegistrationToken = $AvdRegistrationToken
