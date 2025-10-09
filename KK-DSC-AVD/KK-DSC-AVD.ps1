@@ -367,8 +367,11 @@ Configuration PrepareAvdHost
             DependsOn       = '[xPendingReboot]FirstBoot'
             ExecutionPolicy = 'Unrestricted'
         }
+
+        Write-Host "AvdRegistrationToken: \"$AvdRegistrationToken\""
+
         
-        if ($null -ne $AvdRegistrationToken -and $AvdRegistrationToken -ne '') {
+        if ($null -ne $AvdRegistrationToken -and $AvdRegistrationToken.Length -gt 10) {
             InstallAVDAgent InstallAVDAgent {
                 AvdRegistrationToken = $AvdRegistrationToken
                 DependsOn    = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
