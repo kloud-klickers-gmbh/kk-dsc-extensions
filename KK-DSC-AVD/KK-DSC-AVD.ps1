@@ -21,7 +21,7 @@ Configuration InstallAVDAgent {
                 GetScript  = $GetScript
                 SetScript  = $SetScript
                 TestScript = $TestScript
-                Result     = ((Test-Path $uris[0].outFile) -and (test-path $uris[1].outFile))
+                Result     = ((Test-Path $using:uris[0].outFile) -and (test-path $using:uris[1].outFile))
             }
         }
         SetScript  = {
@@ -35,7 +35,7 @@ Configuration InstallAVDAgent {
 
             Start-Transcript -Path "C:\AVD\avdprep.log.txt" -Verbose -Force
 
-            foreach ($uri in $uris) {
+            foreach ($uri in $using:uris) {
                 $expandedUri = (Invoke-WebRequest -MaximumRedirection 0 -Uri $uri.uri -ErrorAction SilentlyContinue).Headers.Location
                 Invoke-WebRequest -Uri $expandedUri -UseBasicParsing -OutFile $uri.outFile
                 Unblock-File -Path $uri.outFile
@@ -44,7 +44,7 @@ Configuration InstallAVDAgent {
             Remove-Variable ProgressPreference -Force
         }
         TestScript = {
-            $Status = ((Test-Path $uris[0].outFile) -and (test-path $uris[1].outFile))
+            $Status = ((Test-Path $using:uris[0].outFile) -and (test-path $using:uris[1].outFile))
             $Status -eq $True
         }        
     }
@@ -67,8 +67,8 @@ Configuration InstallAVDAgent {
                     Start-Sleep -Seconds $retryTimeToSleepInSec
                 }
 
-                Write-Host "Installing $($uris[0].outFile) ..."
-                $processResult = Start-Process -Wait -Passthru -FilePath "msiexec.exe" "/i $($uris[0].outFile) /quiet /norestart REGISTRATIONTOKEN=`"$using:AvdRegistrationToken`""
+                Write-Host "Installing $($using:uris[0].outFile) ..."
+                $processResult = Start-Process -Wait -Passthru -FilePath "msiexec.exe" "/i $($using:uris[0].outFile) /quiet /norestart REGISTRATIONTOKEN=`"$using:AvdRegistrationToken`""
 
                 $sts = $processResult.ExitCode
                 $retryCount++
@@ -83,8 +83,8 @@ Configuration InstallAVDAgent {
                     Start-Sleep -Seconds $retryTimeToSleepInSec
                 }
 
-                Write-Host "Installing $($uris[1].outFile) ..."
-                $processResult = Start-Process -Wait -Passthru -FilePath "msiexec.exe" "/i $($uris[1].outFile) /quiet /norestart"
+                Write-Host "Installing $($using:uris[1].outFile) ..."
+                $processResult = Start-Process -Wait -Passthru -FilePath "msiexec.exe" "/i $($using:uris[1].outFile) /quiet /norestart"
 
                 $sts = $processResult.ExitCode
                 $retryCount++
