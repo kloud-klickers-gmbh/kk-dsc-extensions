@@ -320,14 +320,14 @@ Configuration PrepareAvdHost
     param(
         [boolean]$entraOnly = $false,
         [boolean]$withGPU = $false,
-        [string]$fslogixStorageAccountKey,
-        [int]$ProfileSizeMB,
-        [string[]]$VHDLocations,
-        [string[]]$FSLExcludedMembers,
-        [string]$AvdRegistrationToken,
-        [string]$joinou,
-        [string]$joindomain,
-        [System.Management.Automation.PSCredential]$JoinCredential
+        [string]$fslogixStorageAccountKey = $null,
+        [int]$ProfileSizeMB = $null,
+        [string[]]$VHDLocations = $null,
+        [string[]]$FSLExcludedMembers = $null,
+        [string]$AvdRegistrationToken = $null,
+        [string]$joinou = $null,
+        [string]$joindomain = $null,
+        [System.Management.Automation.PSCredential]$JoinCredential = $null
     )
     
     Import-DscResource -ModuleName 'xDSCDomainjoin'
