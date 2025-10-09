@@ -16,7 +16,6 @@ Configuration InstallAVDAgent {
     )
 
     Script DownloadAgent {
-        DependsOn  = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
         GetScript  = {
             @{
                 GetScript  = $GetScript
