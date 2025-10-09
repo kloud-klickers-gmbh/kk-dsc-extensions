@@ -36,7 +36,7 @@ Configuration InstallAVDAgent {
             Start-Transcript -Path "C:\AVD\avdprep.log.txt" -Verbose -Force
 
             foreach ($uri in $using:uris) {
-                $expandedUri = (Invoke-WebRequest -MaximumRedirection 0 -Uri $uri.uri -ErrorAction SilentlyContinue).Headers.Location
+                $expandedUri = (Invoke-WebRequest -MaximumRedirection 0 -Uri $uri.uri -UseBasicParsing -ErrorAction SilentlyContinue).Headers.Location
                 Invoke-WebRequest -Uri $expandedUri -UseBasicParsing -OutFile $uri.outFile
                 Unblock-File -Path $uri.outFile
             }
