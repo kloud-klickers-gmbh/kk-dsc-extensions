@@ -318,16 +318,38 @@ Configuration ConfigureGPU {
 Configuration PrepareAvdHost
 {
     param(
-        [boolean]$entraOnly = $false,
-        [boolean]$withGPU = $false,
-        [string]$fslogixStorageAccountKey = $null,
-        [int]$ProfileSizeMB = $null,
-        [string[]]$VHDLocations = $null,
-        [string[]]$FSLExcludedMembers = $null,
-        [string]$AvdRegistrationToken = $null,
-        [string]$joinou = $null,
-        [string]$joindomain = $null,
-        [System.Management.Automation.PSCredential]$JoinCredential = $null
+        [boolean]
+        $entraOnly = $false,
+
+        [boolean]
+        $withGPU = $false,
+
+        [String]
+        $fslogixStorageAccountKey = $null,
+
+        [int]
+        $ProfileSizeMB = $null,
+
+        [String[]]
+        $VHDLocations = $null,
+
+        [String[]]
+        $FSLExcludedMembers = $null,
+
+        [String]
+        [AllowEmptyString()]
+        $AvdRegistrationToken = $null,
+
+        [String]
+        [AllowEmptyString()]
+        $joinou = $null,
+
+        [String]
+        [AllowEmptyString()]
+        $joindomain = $null,
+
+        [System.Management.Automation.PSCredential]
+        $JoinCredential = $null
     )
     
     Import-DscResource -ModuleName 'xDSCDomainjoin'
@@ -348,7 +370,7 @@ Configuration PrepareAvdHost
             ExecutionPolicy = 'Unrestricted'
         }
         
-        if ($null -ne $AvdRegistrationToken) {
+        if ($null -ne $AvdRegistrationToken -and $AvdRegistrationToken -ne '') {
             InstallAVDAgent InstallAVDAgent {
                 AvdRegistrationToken = $AvdRegistrationToken
                 DependsOn    = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
