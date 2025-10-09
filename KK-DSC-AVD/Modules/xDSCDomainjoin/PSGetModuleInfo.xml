@@ -1,0 +1,127 @@
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj RefId="0">
+    <TN RefId="0">
+      <T>Microsoft.PowerShell.Commands.PSRepositoryItemInfo</T>
+      <T>System.Management.Automation.PSCustomObject</T>
+      <T>System.Object</T>
+    </TN>
+    <MS>
+      <S N="Name">xDSCDomainjoin</S>
+      <Version N="Version">1.2.23</Version>
+      <S N="Type">Module</S>
+      <S N="Description">Stripped down version of xComputer from the xComputerManagement resource that allows you to join a machine to the domain without the mandatory requirement to specify a machine name. Config example available on project site.</S>
+      <S N="Author">Anthony Waye</S>
+      <S N="CompanyName">Theonlywaye</S>
+      <S N="Copyright">(c) 2016 ajwaye. All rights reserved.</S>
+      <DT N="PublishedDate">2019-08-20T08:41:27+02:00</DT>
+      <Obj N="InstalledDate" RefId="1">
+        <DT>2021-09-21T14:45:38.516423+02:00</DT>
+        <MS>
+          <Obj N="DisplayHint" RefId="2">
+            <TN RefId="1">
+              <T>Microsoft.PowerShell.Commands.DisplayHintType</T>
+              <T>System.Enum</T>
+              <T>System.ValueType</T>
+              <T>System.Object</T>
+            </TN>
+            <ToString>DateTime</ToString>
+            <I32>2</I32>
+          </Obj>
+        </MS>
+      </Obj>
+      <Nil N="UpdatedDate" />
+      <Nil N="LicenseUri" />
+      <URI N="ProjectUri">https://github.com/theonlyway/xDSCDomainjoin</URI>
+      <Nil N="IconUri" />
+      <Obj N="Tags" RefId="3">
+        <TN RefId="2">
+          <T>System.Object[]</T>
+          <T>System.Array</T>
+          <T>System.Object</T>
+        </TN>
+        <LST>
+          <S>PSModule</S>
+        </LST>
+      </Obj>
+      <Obj N="Includes" RefId="4">
+        <TN RefId="3">
+          <T>System.Collections.Hashtable</T>
+          <T>System.Object</T>
+        </TN>
+        <DCT>
+          <En>
+            <S N="Key">Cmdlet</S>
+            <Obj N="Value" RefId="5">
+              <TNRef RefId="2" />
+              <LST />
+            </Obj>
+          </En>
+          <En>
+            <S N="Key">DscResource</S>
+            <Obj N="Value" RefId="6">
+              <TNRef RefId="2" />
+              <LST>
+                <S>xDSCDomainjoin</S>
+              </LST>
+            </Obj>
+          </En>
+          <En>
+            <S N="Key">Command</S>
+            <Ref N="Value" RefId="5" />
+          </En>
+          <En>
+            <S N="Key">RoleCapability</S>
+            <Ref N="Value" RefId="5" />
+          </En>
+          <En>
+            <S N="Key">Function</S>
+            <Ref N="Value" RefId="5" />
+          </En>
+          <En>
+            <S N="Key">Workflow</S>
+            <Ref N="Value" RefId="5" />
+          </En>
+        </DCT>
+      </Obj>
+      <Nil N="PowerShellGetFormatVersion" />
+      <Nil N="ReleaseNotes" />
+      <Obj N="Dependencies" RefId="7">
+        <TNRef RefId="2" />
+        <LST />
+      </Obj>
+      <S N="RepositorySourceLocation">https://www.powershellgallery.com/api/v2</S>
+      <S N="Repository">PSGallery</S>
+      <S N="PackageManagementProvider">NuGet</S>
+      <Obj N="AdditionalMetadata" RefId="8">
+        <TN RefId="4">
+          <T>System.Management.Automation.PSCustomObject</T>
+          <T>System.Object</T>
+        </TN>
+        <MS>
+          <S N="copyright">(c) 2016 ajwaye. All rights reserved.</S>
+          <S N="description">Stripped down version of xComputer from the xComputerManagement resource that allows you to join a machine to the domain without the mandatory requirement to specify a machine name. Config example available on project site.</S>
+          <S N="requireLicenseAcceptance">False</S>
+          <S N="isLatestVersion">True</S>
+          <S N="isAbsoluteLatestVersion">True</S>
+          <S N="versionDownloadCount">15209</S>
+          <S N="downloadCount">29563</S>
+          <S N="packageSize">85047</S>
+          <S N="published">20.08.2019 08:41:27 +02:00</S>
+          <S N="created">20.08.2019 08:41:27 +02:00</S>
+          <S N="lastUpdated">21.09.2021 10:16:12 +02:00</S>
+          <S N="tags">PSModule PSDscResource_x005F_xDSCDomainjoin PSIncludes_DscResource</S>
+          <S N="developmentDependency">False</S>
+          <S N="updated">2021-09-21T10:16:12Z</S>
+          <S N="NormalizedVersion">1.2.23</S>
+          <S N="Authors">Anthony Waye</S>
+          <S N="IsPrerelease">false</S>
+          <S N="ItemType">Module</S>
+          <S N="FileList">xDSCDomainjoin.nuspec|appveyor.yml|license|README.md|TestsResults.xml|xDSCDomainjoin.psd1|.git\config|.git\description|.git\HEAD|.git\index|.git\packed-refs|.git\hooks\applypatch-msg.sample|.git\hooks\commit-msg.sample|.git\hooks\fsmonitor-watchman.sample|.git\hooks\post-update.sample|.git\hooks\pre-applypatch.sample|.git\hooks\pre-commit.sample|.git\hooks\pre-push.sample|.git\hooks\pre-rebase.sample|.git\hooks\pre-receive.sample|.git\hooks\prepare-commit-msg.sample|.git\hooks\update.sample|.git\info\exclude|.git\logs\HEAD|.git\logs\refs\remotes\origin\HEAD|.git\objects\00\8c613afcb1431410444e3d3d7840f822ab2a43|.git\objects\03\f8cd8ce3d0d13acef58bd8d6b8e3cfa209d0da|.git\objects\05\3d5bb56a01133bf26083d204cc2a43090396d4|.git\objects\0a\9491478b5a8e30f6b2f484c9f518ce2755f2b9|.git\objects\11\4e1e0ee1297a65a100f497bcb3c1c49ea234c6|.git\objects\11\92cc8cfc042ae876980a1ca2e7140772c56c9e|.git\objects\15\d3d4bbf10077dcc8b7298a506fef982126afc2|.git\objects\19\2461a80de586f56291f667199916695ff8913f|.git\objects\19\8d69d389bba3a4439777e2dd26332c2e93f929|.git\objects\1b\2ed1f8b8f296b4f2b78a98bfcb6ef3bac0ccde|.git\objects\1b\7ffea251307acfe743e23c80dd7f82757f5c42|.git\objects\1c\00c2559c70057cccdf591b07c05f140a042027|.git\objects\1c\a6b28ae6ede6566692bf372e66c12f4c6fe948|.git\objects\1d\22f210caefe42c3765bf38b132e915520ef981|.git\objects\21\2e77d453cf08c866bc05b0ed8fca197204366a|.git\objects\21\53a3dda7e023c76dd2da9a66a23bd33033db66|.git\objects\22\8a5c32ae0e4840effb99380abcfe13a2b1b7ef|.git\objects\24\ea97f237c3ac3311fdcdab7d8346638c6c83e9|.git\objects\25\70b06b6cedb0b41100a85ba323bbc634dd7632|.git\objects\26\6946ca66395b646d03ee33c6a15b7022f66212|.git\objects\27\2d9da170df404f512ba1401c92329d41fff6b0|.git\objects\2b\b5aa68f9b9d5d12477abec4185a3525d4429fa|.git\objects\3d\5992fa382e04c29184aef87136a801ccd51e8b|.git\objects\3d\6da837586fa418e1edde2c4e23d683f26da803|.git\objects\3d\a93599884568314e802730fcb3d783e2a7a043|.git\objects\47\be8eba82486359a688de35aa54fc12af8ddd03|.git\objects\49\825554f879b0eff1006b956e06508d6b03e2ef|.git\objects\49\c921faac452b3f733e6cc108638de38707c05e|.git\objects\4e\007610d905bd04d2779c5eed42baf4882da8d9|.git\objects\54\37d9224d081c9dce121b576a4e32c57699c133|.git\objects\54\c342552d476448a2bb0a0a9ca9cb283c5d397f|.git\objects\55\647ebf4286ae37f0c9b671361942660fb5c6c5|.git\objects\55\6a419a2d6dc2a7d2695aa4ed05d59c606b72f3|.git\objects\59\5e8cf8adc7aaecd5cfdf362b09cab393ade95a|.git\objects\5f\66c57c17bae22b4d7ccd9f03d9b0cfb219d074|.git\objects\65\608f1969a2b82ac4ba521593a941d671a49aa9|.git\objects\66\b1f405e1ee4247c238a243e015590d2fe3b0ef|.git\objects\67\eebeb2310d9631af92f44d284fc1c1d39d795a|.git\objects\6b\9a3b825e7a973c23fa032afc9615b085165c26|.git\objects\6b\ee88ad0f2e0defc21e4debe921d6bf99ae51ea|.git\objects\6d\401c8354d939cf2085c07dee5e9b6fe1c04394|.git\objects\6e\ffbff7371878ffc2273b43028415492927a530|.git\objects\74\b0167b8bf7049ef3109955c03526e84309740c|.git\objects\75\6ace8550338188c5d0ba12f78a689661a096c6|.git\objects\76\1283740cb718dc5389913dd2ebbcac1d8dceed|.git\objects\77\0735a761b689a1c4acb5860318ea7811fa9151|.git\objects\78\b04a3822dabc7b05cbf7896bd5a234cabdb47c|.git\objects\7a\1e137acaa8b6dc2e675508730d1169a647e745|.git\objects\7d\3be9456f0e18cd084d8e599535e61ab40a10ee|.git\objects\81\7de07dbf92497db7e4ff1232d5a4202853a541|.git\objects\81\8474eaf4ee2d261b4b307e3a57c9e8625fe867|.git\objects\84\e3dd0d4f24406a7101aa546dc2afb1b5c8697c|.git\objects\85\16d0db4a311d4155df9d720fa56e24366ab31f|.git\objects\87\b8e01c37e25664cc94f92272a195eeac6491eb|.git\objects\8c\66e74323d21bfd1ed5565377fbfc8aedd6367e|.git\objects\8d\3d0025995a9ae9c5dadc2017cc97d4affc75e5|.git\objects\91\183041e40b052f5153d0a290d6af181cea3add|.git\objects\93\b7cd86e9c3f1563d3545fdd3e3aa2e75e305d0|.git\objects\96\10794a3a38b760e2666a453bfdb14f31b43254|.git\objects\9d\96b38f68cb2d925f2db2ccdbbb75a539b79dc7|.git\objects\a1\c534443bf3d88f861573e0f6270ecd73508e87|.git\objects\a3\000c4a2d9b03ef66507342636ca4dfca1d3136|.git\objects\a7\22ec5e16418f16cb64788516dd90d7a48ca85c|.git\objects\a9\74574c7753802f69b17419547b9b3e83cac823|.git\objects\aa\0509ecf8b8e5b34777094813120034a1e9a6c2|.git\objects\ab\9ea3cdae0f274d3061255da5608b1821faa64c|.git\objects\b2\c70ceca7a31cbe0733fd5ce7ef043eb4631863|.git\objects\b3\5eba9ae04665fd911691de5974bffa2e5b649a|.git\objects\b4\103463b6249ea96884ec6829df0d4572ba522d|.git\objects\b4\f995c056710f15990bc4f4985c11aa87802feb|.git\objects\b6\900399997f2a65ad7aa11a16e8a2b26fa76a92|.git\objects\b7\8d9618b0e553ccd1bdee0ae224e00c0db202a8|.git\objects\ba\f4a2831658bdcd61dbfc8ce76cdaf256c142a5|.git\objects\bb\df37386de9c5d5e1237223aa6f665a44c11330|.git\objects\bd\b0cabc87cf50106df6e15097dff816c8c3eb34|.git\objects\c4\79f2847a4a1718974b97f958b48756896dec24|.git\objects\c4\bbc15e89b937e64256aeda57bbf890e76de3c8|.git\objects\c8\fbd26776e0480c6319641789589c2e645bf732|.git\objects\ca\fdd59dbe75dde92eb56cf2ee8b73c463300abc|.git\objects\cd\2946ad76b4402e5b3cab9243a9281aad228670|.git\objects\d0\3f40c78751e73b7fafa21157e07cfc3fd8488e|.git\objects\d3\315b6da77a19dcdc93c7477a36e2ea09c8a6d5|.git\objects\d4\f7f1dd977df4fa7b6c93fd02a94008a2a4f213|.git\objects\d7\e3b86d9c6ae0f8a5748db127a245ea4acdc7b3|.git\objects\dc\5b272576f620f0f51cce9e7bc91d3e330d8f56|.git\objects\dc\6571979312653de1910ea55453bc47795ea050|.git\objects\df\8e696821583ef98f9ad5bb8bab4b1dc27c21fd|.git\objects\e1\7f2e974bd82d19877cad024d72bdacf67a9d54|.git\objects\e2\08a14626c3b9395b6487d18d55c847774d6ad7|.git\objects\e2\d0a9c3fa86ef51a6e8e1445e754c1b5c472eae|.git\objects\e6\ea143730f7ab830d58fa94360c1ad1f76911a6|.git\objects\ea\310b8ea0f4718371d913db9d086c2c1b6d1a2c|.git\objects\f1\338155b2e84e200c571d545891eb225a0f7a36|.git\objects\f8\5626c88d013f697e7a2e8ae76321696cca064d|.git\objects\fa\0b35b78853ea926059bb27bb7370808967e024|.git\objects\ff\3e675b3d3a3d8a5a2bc81ea5858601d0167f1e|.git\refs\remotes\origin\HEAD|DSCResources\xDSCDomainjoin\xDSCDomainjoin.psm1|DSCResources\xDSCDomainjoin\xDSCDomainjoin.schema.mof|Tests\xDSCDomainjoin.Tests.ps1</S>
+          <S N="GUID">00c8d31c-e80f-4046-89a8-83af68ebef5f</S>
+          <S N="CompanyName">Unknown</S>
+        </MS>
+      </Obj>
+      <S N="InstalledLocation">C:\Users\mmueller\OneDrive - IT sure GmbH\Dokumente\PowerShell\Modules\xDSCDomainjoin\1.2.23</S>
+    </MS>
+  </Obj>
+</Objs>

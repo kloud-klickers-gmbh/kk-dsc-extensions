@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="7" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2019-08-20" time="08:41:14">
+  <environment user="appveyor" machine-name="APPVYR-WIN" cwd="C:\projects\xdscdomainjoin" user-domain="APPVYR-WIN" platform="Microsoft Windows Server 2012 R2 Datacenter|C:\windows|\Device\Harddisk0\Partition5" nunit-version="2.5.8.0" os-version="6.3.9600" clr-version="4.0.30319.42000" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Success" success="True" time="2.0831" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="C:\projects\xdscdomainjoin\Tests\xDSCDomainjoin.Tests.ps1" executed="True" result="Success" success="True" time="2.0831" asserts="0" description="C:\projects\xdscdomainjoin\Tests\xDSCDomainjoin.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Testing if functions return correct objects" executed="True" result="Success" success="True" time="0.8798" asserts="0" description="Testing if functions return correct objects">
+            <results>
+              <test-case description="Get-TargetResource returns a hashtable" name="Testing if functions return correct objects.Get-TargetResource returns a hashtable" time="0.3286" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Test-TargetResource returns true or false" name="Testing if functions return correct objects.Test-TargetResource returns true or false" time="0.0154" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Testing if Get-TargetResource returns correct values" executed="True" result="Success" success="True" time="0.8411" asserts="0" description="Testing if Get-TargetResource returns correct values">
+            <results>
+              <test-case description="Get-TargetResource returns domain test.local" name="Testing if Get-TargetResource returns correct values.Get-TargetResource returns domain test.local" time="0.3152" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Get-TargetResource returns credentials" name="Testing if Get-TargetResource returns correct values.Get-TargetResource returns credentials" time="0.0197" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Get-TargetResource returns OU ou=test,dc=test,dc=com" name="Testing if Get-TargetResource returns correct values.Get-TargetResource returns OU ou=test,dc=test,dc=com" time="0.0117" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Testing Test-TargetResource" executed="True" result="Success" success="True" time="0.1037" asserts="0" description="Testing Test-TargetResource">
+            <results>
+              <test-case description="Test-TargetResource should return true as it matches test.local" name="Testing Test-TargetResource.Test-TargetResource should return true as it matches test.local" time="0.0154" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Test-TargetResource should return false as it shouldn't match test.local" name="Testing Test-TargetResource.Test-TargetResource should return false as it shouldn't match test.local" time="0.0138" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
