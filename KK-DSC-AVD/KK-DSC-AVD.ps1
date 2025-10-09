@@ -1,7 +1,7 @@
 Configuration InstallAVDAgent {
     param(
         [Parameter(Mandatory = $true)]
-        [String] $registration
+        [String] $AvdRegistrationToken
     )
 
     $uris = @(
@@ -69,7 +69,7 @@ Configuration InstallAVDAgent {
                 }
 
                 Write-Host "Installing $($uris[0].outFile) ..."
-                $processResult = Start-Process -Wait -Passthru -FilePath "msiexec.exe" "/i $($uris[0].outFile) /quiet /norestart REGISTRATIONTOKEN=`"$using:registration`""
+                $processResult = Start-Process -Wait -Passthru -FilePath "msiexec.exe" "/i $($uris[0].outFile) /quiet /norestart REGISTRATIONTOKEN=`"$using:AvdRegistrationToken`""
 
                 $sts = $processResult.ExitCode
                 $retryCount++
@@ -104,30 +104,28 @@ Configuration ConfigureFSLogix {
 
     param(
         [Parameter(Mandatory = $true)]
-        [String] $fslogixStorageAccount,
-
-        [Parameter(Mandatory = $true)]
-        [String] $fslogixShareName,
-
-        [Parameter(Mandatory = $true)]
-        [System.Management.Automation.PSCredential] $fslogixSecret,
+        [String] $fslogixStorageAccountKey,
 
         [Parameter(Mandatory = $true)]
         [Int]$ProfileSizeMB,
 
         [Parameter(Mandatory = $true)]
-        [string[]]$VHDLocations,
+        [String[]]$VHDLocations,
 
         [Parameter(Mandatory = $true)]
-        [string[]]$FSLExcludedMembers
-
+        [String[]]$FSLExcludedMembers
     )
 
-    $fileServer = "$($fslogixStorageAccount).file.core.windows.net"
+    # Get first $VHDLocations entry and extract fileServer from it
+    # $VHDLocations is expected to be like: "\\<storageaccount>.file.core.windows.net\<sharename>"
+    # $fileServer will be "<storageaccount>.file.core.windows.net"
+    $fileServer = ($VHDLocations[0] -split '\\')[2]
     
-    # $profileShare = "\\$($fslogixStorageAccount)\$($fslogixShareName)" # We are using VHDLocations instead
+    # Extract storage account name from file server
+    $storageAccount = ($fileServer -split '\.')[0]
 
-    $user = "localhost\$($fslogixStorageAccount)"
+    
+    $user = "localhost\$($storageAccount)"
 
 
     Registry FSLPropertiesReg-Enabled {
@@ -238,7 +236,7 @@ Configuration ConfigureFSLogix {
             @{ 
                 Ensure     = 'Present';
                 FileServer = $fileServer;
-                UserName   = $fslogixSecret.UserName;
+                UserName   = $user;
             }
         }
 
@@ -256,7 +254,7 @@ Configuration ConfigureFSLogix {
 
             try {
                 # Build the cmdline. Quote values that may need quoting.
-                $cmd = "cmdkey.exe /add:`"$target`" /user:`"$($fslogixSecret.UserName)`" /pass:`"$($fslogixSecret.GetNetworkCredential().Password)`""
+                $cmd = "cmdkey.exe /add:`"$target`" /user:`"$($user)`" /pass:`"$($fslogixStorageAccountKey)`""
 
                 # Execute cmdkey
                 $proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c", $cmd -NoNewWindow -Wait -PassThru
@@ -322,10 +320,11 @@ Configuration PrepareAvdHost
     param(
         [boolean]$entraOnly = $false,
         [boolean]$withGPU = $false,
-        [String]$fslogixStorageAccount,
-        [String]$fslogixShareName,
-        [System.Management.Automation.PSCredential]$fslogixSecret,
-        [string]$registration,
+        [string]$fslogixStorageAccountKey,
+        [int]$ProfileSizeMB,
+        [string[]]$VHDLocations,
+        [string[]]$FSLExcludedMembers,
+        [string]$AvdRegistrationToken,
         [string]$joinou,
         [string]$joindomain,
         [System.Management.Automation.PSCredential]$JoinCredential
@@ -349,13 +348,19 @@ Configuration PrepareAvdHost
             ExecutionPolicy = 'Unrestricted'
         }
         
-        InstallAVDAgent InstallAVDAgent {
-            registration = $registration
-            DependsOn    = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
+        if ($null -ne $AvdRegistrationToken) {
+            InstallAVDAgent InstallAVDAgent {
+                AvdRegistrationToken = $AvdRegistrationToken
+                DependsOn    = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
+            }
         }
 
         ConfigureFSLogix ConfigureFSLogix {
-            DependsOn = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
+            fslogixStorageAccountKey = $fslogixStorageAccountKey
+            ProfileSizeMB            = $ProfileSizeMB
+            VHDLocations             = $VHDLocations
+            FSLExcludedMembers       = $FSLExcludedMembers
+            DependsOn                = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
         }
 
         if ($withGPU) {
