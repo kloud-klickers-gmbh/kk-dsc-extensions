@@ -313,7 +313,6 @@ Configuration ConfigureGPU {
 
 
 
-
 Configuration PrepareAvdHost
 {
     param(
