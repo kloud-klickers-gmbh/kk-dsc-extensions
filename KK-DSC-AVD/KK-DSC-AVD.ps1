@@ -118,10 +118,10 @@ Configuration ConfigureFSLogix {
     # Get first $VHDLocations entry and extract fileServer from it
     # $VHDLocations is expected to be like: "\\<storageaccount>.file.core.windows.net\<sharename>"
     # $fileServer will be "<storageaccount>.file.core.windows.net"
-    $fileServer = ($VHDLocations[0] -split '\\')[2]
+    $fileServer = ($VHDLocations[0] -split '\\')[2].Trim()
     
     # Extract storage account name from file server
-    $storageAccount = ($fileServer -split '\.')[0]
+    $storageAccount = ($fileServer -split '\.')[0].Trim()
 
     
     $user = "localhost\$($storageAccount)"
@@ -250,164 +250,172 @@ Configuration ConfigureFSLogix {
         SetScript  = {
             $target = $using:fileServer
 
-            Write-Host "Adding cmdkey entry for $target using $($using:user) ..."
+            try {
+                Write-Host "Adding cmdkey entry for $target using $($using:user) ..."
 
-            # Build the cmdline. Quote values that may need quoting.
-            $cmd = "cmdkey.exe /add:`"$target`" /user:`"$($using:user)`" /pass:`"$($using:fslogixStorageAccountKey)`""
+                # Build the cmdline. Quote values that may need quoting.
+                $arguments = "/add:`"$target`" /user:`"$($using:user)`" /pass:`"$($using:fslogixStorageAccountKey)`""
 
-            # Execute cmdkey
-            $proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c", $cmd -NoNewWindow -Wait -PassThru
-            if ($proc.ExitCode -ne 0) {
-                throw "cmdkey failed with exit code $($proc.ExitCode)"
+                # Execute cmdkey
+                $proc = Start-Process -FilePath "cmdkey.exe" $arguments -NoNewWindow -Wait -PassThru
+                if ($proc.ExitCode -ne 0) {
+                    throw "cmdkey failed with exit code $($proc.ExitCode)"
+                }
+
+                Write-Debug "cmdkey executed successfully."
             }
+            finally {
+                Write-Host "Finished processing cmdkey entry for $target"
+                # Clear arguments variable
+                $arguments = $null
+            }
+        }
+
+        # Disable Windows Defender Credential Guard (only needed for Windows 11 22H2)
+        # Registry AzureADAccount-LoadCredKeyFromProfile {
+        #     Ensure    = 'Present'
+        #     Key       = 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa'
+        #     ValueName = 'LsaCfgFlags'
+        #     ValueType = 'Dword'
+        #     ValueData = '0'
+        # }
+    }
+
+
+    Configuration ConfigureGPU {
+        Registry RDSPol-HWbeforeSW {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services'
+            ValueName = 'bEnumerateHWBeforeSW'
+            ValueType = 'Dword'
+            ValueData = '1'
+        }
+        Registry RDSPol-AVC444ModePref {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services'
+            ValueName = 'AVC444ModePreferred'
+            ValueType = 'Dword'
+            ValueData = '1'
+        }
+        Registry RDSPol-AVCHWEncPref {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services'
+            ValueName = 'AVCHardwareEncodePreferred'
+            ValueType = 'Dword'
+            ValueData = '1'
+        }
+        Registry RDSPol-FPS60 {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations'
+            ValueName = 'DWMFRAMEINTERVAL'
+            ValueType = 'Dword'
+            ValueData = '15'
         }
     }
 
-    # Disable Windows Defender Credential Guard (only needed for Windows 11 22H2)
-    # Registry AzureADAccount-LoadCredKeyFromProfile {
-    #     Ensure    = 'Present'
-    #     Key       = 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa'
-    #     ValueName = 'LsaCfgFlags'
-    #     ValueType = 'Dword'
-    #     ValueData = '0'
-    # }
-}
 
 
-Configuration ConfigureGPU {
-    Registry RDSPol-HWbeforeSW {
-        Ensure    = 'Present'
-        Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services'
-        ValueName = 'bEnumerateHWBeforeSW'
-        ValueType = 'Dword'
-        ValueData = '1'
-    }
-    Registry RDSPol-AVC444ModePref {
-        Ensure    = 'Present'
-        Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services'
-        ValueName = 'AVC444ModePreferred'
-        ValueType = 'Dword'
-        ValueData = '1'
-    }
-    Registry RDSPol-AVCHWEncPref {
-        Ensure    = 'Present'
-        Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services'
-        ValueName = 'AVCHardwareEncodePreferred'
-        ValueType = 'Dword'
-        ValueData = '1'
-    }
-    Registry RDSPol-FPS60 {
-        Ensure    = 'Present'
-        Key       = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations'
-        ValueName = 'DWMFRAMEINTERVAL'
-        ValueType = 'Dword'
-        ValueData = '15'
-    }
-}
-
-
-
-Configuration PrepareAvdHost
-{
-    param(
-        [boolean]
-        $entraOnly = $false,
-
-        [boolean]
-        $withGPU = $false,
-
-        [String]
-        $fslogixStorageAccountKey = $null,
-
-        [int]
-        $ProfileSizeMB = $null,
-
-        [String[]]
-        $VHDLocations = $null,
-
-        [String[]]
-        $FSLExcludedMembers = $null,
-
-        [String]
-        [AllowEmptyString()]
-        $AvdRegistrationToken = $null,
-
-        [String]
-        [AllowEmptyString()]
-        $joinou = $null,
-
-        [String]
-        [AllowEmptyString()]
-        $joindomain = $null,
-
-        [System.Management.Automation.PSCredential]
-        $JoinCredential = $null
-    )
-    
-    Import-DscResource -ModuleName 'xDSCDomainjoin'
-    Import-DscResource -ModuleName 'xPowerShellExecutionPolicy'
-    Import-DscResource -ModuleName 'xPendingReboot'
-
-    Node localhost
+    Configuration PrepareAvdHost
     {
-        xPendingReboot FirstBoot {
-            Name = 'Firstboot'
-        }
-        LocalConfigurationManager {
-            RebootNodeIfNeeded = $true
-        }
-        xPowerShellExecutionPolicy UnrestrictedExePol
+        param(
+            [boolean]
+            $entraOnly = $false,
+
+            [boolean]
+            $withGPU = $false,
+
+            [String]
+            $fslogixStorageAccountKey = $null,
+
+            [int]
+            $ProfileSizeMB = $null,
+
+            [String[]]
+            $VHDLocations = $null,
+
+            [String[]]
+            $FSLExcludedMembers = $null,
+
+            [String]
+            [AllowEmptyString()]
+            $AvdRegistrationToken = $null,
+
+            [String]
+            [AllowEmptyString()]
+            $joinou = $null,
+
+            [String]
+            [AllowEmptyString()]
+            $joindomain = $null,
+
+            [System.Management.Automation.PSCredential]
+            $JoinCredential = $null
+        )
+    
+        Import-DscResource -ModuleName 'xDSCDomainjoin'
+        Import-DscResource -ModuleName 'xPowerShellExecutionPolicy'
+        Import-DscResource -ModuleName 'xPendingReboot'
+
+        Node localhost
         {
-            DependsOn       = '[xPendingReboot]FirstBoot'
-            ExecutionPolicy = 'Unrestricted'
-        }
-
-        $finalDependsOn = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
-
-        if ($null -ne $AvdRegistrationToken -and $AvdRegistrationToken.Length -gt 10) {
-            InstallAVDAgent InstallAVDAgent {
-                AvdRegistrationToken = $AvdRegistrationToken
-                DependsOn    = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
+            xPendingReboot FirstBoot {
+                Name = 'Firstboot'
+            }
+            LocalConfigurationManager {
+                RebootNodeIfNeeded = $true
+            }
+            xPowerShellExecutionPolicy UnrestrictedExePol
+            {
+                DependsOn       = '[xPendingReboot]FirstBoot'
+                ExecutionPolicy = 'Unrestricted'
             }
 
-            $finalDependsOn = '[InstallAVDAgent]InstallAVDAgent'
-        }
+            $finalDependsOn = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
 
-        ConfigureFSLogix ConfigureFSLogix {
-            fslogixStorageAccountKey = $fslogixStorageAccountKey
-            ProfileSizeMB            = $ProfileSizeMB
-            VHDLocations             = $VHDLocations
-            FSLExcludedMembers       = $FSLExcludedMembers
-            DependsOn                = $finalDependsOn
-        }
+            if ($null -ne $AvdRegistrationToken -and $AvdRegistrationToken.Length -gt 10) {
+                InstallAVDAgent InstallAVDAgent {
+                    AvdRegistrationToken = $AvdRegistrationToken
+                    DependsOn            = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
+                }
 
-        $finalDependsOn = '[ConfigureFSLogix]ConfigureFSLogix'
-
-        if ($withGPU) {
-            ConfigureGPU ConfigureGPU {
-                DependsOn = $finalDependsOn
+                $finalDependsOn = '[InstallAVDAgent]InstallAVDAgent'
             }
 
-            $finalDependsOn = '[ConfigureGPU]ConfigureGPU'
-        }
+            ConfigureFSLogix ConfigureFSLogix {
+                fslogixStorageAccountKey = $fslogixStorageAccountKey
+                ProfileSizeMB            = $ProfileSizeMB
+                VHDLocations             = $VHDLocations
+                FSLExcludedMembers       = $FSLExcludedMembers
+                DependsOn                = $finalDependsOn
+            }
+
+            $finalDependsOn = '[ConfigureFSLogix]ConfigureFSLogix'
+
+            if ($withGPU) {
+                ConfigureGPU ConfigureGPU {
+                    DependsOn = $finalDependsOn
+                }
+
+                $finalDependsOn = '[ConfigureGPU]ConfigureGPU'
+            }
         
-        if ($entraOnly -eq $false) {
-            xDSCDomainjoin JoinDomain {
-                DependsOn  = $finalDependsOn
-                Domain     = $joindomain
-                JoinOU     = $joinou
-                Credential = $JoinCredential
+            if ($entraOnly -eq $false) {
+                xDSCDomainjoin JoinDomain {
+                    DependsOn  = $finalDependsOn
+                    Domain     = $joindomain
+                    JoinOU     = $joinou
+                    Credential = $JoinCredential
+                }
+                xPendingReboot RebootDomJoin {
+                    Name      = 'DomJoinReboot'
+                    DependsOn = '[xDSCDomainjoin]JoinDomain'
+                }
             }
-            xPendingReboot RebootDomJoin {
-                Name      = 'DomJoinReboot'
-                DependsOn = '[xDSCDomainjoin]JoinDomain'
-            }
-        }
         
-        LocalConfigurationManager {
-            RebootNodeIfNeeded = $true
-        }        
+            LocalConfigurationManager {
+                RebootNodeIfNeeded = $true
+            }        
+        }
     }
-}
 
 
