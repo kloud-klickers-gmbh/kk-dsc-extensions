@@ -250,16 +250,15 @@ Configuration ConfigureFSLogix {
         SetScript  = {
             $target = $using:fileServer
 
+            Write-Host "Adding cmdkey entry for $target using $($using:user) ..."
 
-            try {
-                # Build the cmdline. Quote values that may need quoting.
-                $cmd = "cmdkey.exe /add:`"$target`" /user:`"$($using:user)`" /pass:`"$($using:fslogixStorageAccountKey)`""
+            # Build the cmdline. Quote values that may need quoting.
+            $cmd = "cmdkey.exe /add:`"$target`" /user:`"$($using:user)`" /pass:`"$($using:fslogixStorageAccountKey)`""
 
-                # Execute cmdkey
-                $proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c", $cmd -NoNewWindow -Wait -PassThru
-                if ($proc.ExitCode -ne 0) {
-                    throw "cmdkey failed with exit code $($proc.ExitCode)"
-                }
+            # Execute cmdkey
+            $proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c", $cmd -NoNewWindow -Wait -PassThru
+            if ($proc.ExitCode -ne 0) {
+                throw "cmdkey failed with exit code $($proc.ExitCode)"
             }
         }
     }
