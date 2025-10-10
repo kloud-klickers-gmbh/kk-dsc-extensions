@@ -368,11 +368,15 @@ Configuration PrepareAvdHost
             ExecutionPolicy = 'Unrestricted'
         }
 
+        $finalDependsOn = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
+
         if ($null -ne $AvdRegistrationToken -and $AvdRegistrationToken.Length -gt 10) {
             InstallAVDAgent InstallAVDAgent {
                 AvdRegistrationToken = $AvdRegistrationToken
                 DependsOn    = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
             }
+
+            $finalDependsOn = '[InstallAVDAgent]InstallAVDAgent'
         }
 
         ConfigureFSLogix ConfigureFSLogix {
@@ -380,18 +384,22 @@ Configuration PrepareAvdHost
             ProfileSizeMB            = $ProfileSizeMB
             VHDLocations             = $VHDLocations
             FSLExcludedMembers       = $FSLExcludedMembers
-            DependsOn                = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
+            DependsOn                = $finalDependsOn
         }
+
+        $finalDependsOn = '[ConfigureFSLogix]ConfigureFSLogix'
 
         if ($withGPU) {
             ConfigureGPU ConfigureGPU {
-                DependsOn = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
+                DependsOn = $finalDependsOn
             }
+
+            $finalDependsOn = '[ConfigureGPU]ConfigureGPU'
         }
         
-        if (-not $entraOnly) {
+        if ($entraOnly -eq $false) {
             xDSCDomainjoin JoinDomain {
-                DependsOn  = '[InstallAVDAgent]InstallAVDAgent'
+                DependsOn  = $finalDependsOn
                 Domain     = $joindomain
                 JoinOU     = $joinou
                 Credential = $JoinCredential
@@ -401,9 +409,6 @@ Configuration PrepareAvdHost
                 DependsOn = '[xDSCDomainjoin]JoinDomain'
             }
         }
-
-
-
         
         LocalConfigurationManager {
             RebootNodeIfNeeded = $true
