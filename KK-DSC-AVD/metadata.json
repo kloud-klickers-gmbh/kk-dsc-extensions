@@ -1,1 +1,6 @@
-{"Modules":["xDSCDomainjoin","xPowerShellExecutionPolicy","xPendingReboot"]}
+{
+    "Modules": [
+        "xDSCDomainjoin",
+        "xPendingReboot"
+    ]
+}

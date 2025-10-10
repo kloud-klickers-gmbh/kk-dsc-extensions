@@ -354,7 +354,6 @@ Configuration PrepareAvdHost
     )
     
     Import-DscResource -ModuleName 'xDSCDomainjoin'
-    Import-DscResource -ModuleName 'xPowerShellExecutionPolicy'
     Import-DscResource -ModuleName 'xPendingReboot'
 
     Node localhost
@@ -365,18 +364,13 @@ Configuration PrepareAvdHost
         LocalConfigurationManager {
             RebootNodeIfNeeded = $true
         }
-        xPowerShellExecutionPolicy UnrestrictedExePol
-        {
-            DependsOn       = '[xPendingReboot]FirstBoot'
-            ExecutionPolicy = 'Unrestricted'
-        }
 
-        $finalDependsOn = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
+        $finalDependsOn = '[xPendingReboot]FirstBoot'
 
         if ($null -ne $AvdRegistrationToken -and $AvdRegistrationToken.Length -gt 10) {
             InstallAVDAgent InstallAVDAgent {
                 AvdRegistrationToken = $AvdRegistrationToken
-                DependsOn            = '[xPowerShellExecutionPolicy]UnrestrictedExePol'
+                DependsOn            = '[xPendingReboot]FirstBoot'
             }
 
             $finalDependsOn = '[InstallAVDAgent]InstallAVDAgent'
