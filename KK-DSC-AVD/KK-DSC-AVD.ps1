@@ -234,13 +234,13 @@ Configuration ConfigureFSLogix {
         GetScript  = {
             @{ 
                 Ensure     = 'Present';
-                FileServer = $fileServer;
-                UserName   = $user;
+                FileServer = $using:fileServer;
+                UserName   = $using:user;
             }
         }
 
         TestScript = {
-            $target = $fileServer.Trim() 
+            $target = $using:fileServer
             # cmdkey lists entries like: "Target: domain:TERMSRV/fileserver"
             # We'll just check for the target string in cmdkey output
             $list = & cmdkey.exe /list 2>&1 | Out-String
@@ -248,23 +248,18 @@ Configuration ConfigureFSLogix {
         }
 
         SetScript  = {
-            $target = $fileServer.Trim()
+            $target = $using:fileServer
 
 
             try {
                 # Build the cmdline. Quote values that may need quoting.
-                $cmd = "cmdkey.exe /add:`"$target`" /user:`"$($user)`" /pass:`"$($fslogixStorageAccountKey)`""
+                $cmd = "cmdkey.exe /add:`"$target`" /user:`"$($using:user)`" /pass:`"$($using:fslogixStorageAccountKey)`""
 
                 # Execute cmdkey
                 $proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c", $cmd -NoNewWindow -Wait -PassThru
                 if ($proc.ExitCode -ne 0) {
                     throw "cmdkey failed with exit code $($proc.ExitCode)"
                 }
-            }
-            finally {
-                # Zero out & free the plain text memory quickly
-                if ($bstr) { [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
-                if ($plainPass) { $plainPass = $null }
             }
         }
     }
