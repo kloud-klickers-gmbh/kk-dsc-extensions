@@ -103,9 +103,6 @@ Configuration ConfigureFSLogix {
 
     param(
         [Parameter(Mandatory = $true)]
-        [String] $fslogixStorageAccountKey,
-
-        [Parameter(Mandatory = $true)]
         [Int]$ProfileSizeMB,
 
         [Parameter(Mandatory = $true)]
@@ -115,17 +112,6 @@ Configuration ConfigureFSLogix {
         [String[]]$FSLExcludedMembers
     )
 
-    # Get first $VHDLocations entry and extract fileServer from it
-    # $VHDLocations is expected to be like: "\\<storageaccount>.file.core.windows.net\<sharename>"
-    # $fileServer will be "<storageaccount>.file.core.windows.net"
-    $fileServer = ($VHDLocations[0] -split '\\')[2].Trim()
-    
-    # Extract storage account name from file server
-    $storageAccount = ($fileServer -split '\.')[0].Trim()
-
-    
-    $user = "localhost\$($storageAccount)"
-
 
     Registry FSLPropertiesReg-Enabled {
         Ensure    = 'Present'
@@ -134,6 +120,8 @@ Configuration ConfigureFSLogix {
         ValueType = 'Dword'
         ValueData = '1'
     }
+
+    # $VHDLocations is expected to be like: "\\<storageaccount>.file.core.windows.net\<sharename>"
     Registry FSLPropertiesReg-VHDLocations {
         Ensure    = 'Present'
         Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
@@ -141,6 +129,7 @@ Configuration ConfigureFSLogix {
         ValueType = 'MultiString'
         ValueData = $VHDLocations
     }
+
     Registry FSLPropertiesReg-ConcurrentUserSessions {
         Ensure    = 'Present'
         Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
@@ -212,13 +201,33 @@ Configuration ConfigureFSLogix {
         ValueData = '1'
     }
     
-
-    
     Group FSLExclude {
         GroupName        = 'FSLogix Profile Exclude List'
         Ensure           = 'Present'
         MembersToInclude = $FSLExcludedMembers
     }
+}
+
+Configuration ConfigureFSLogixKey {
+
+    param(
+        [Parameter(Mandatory = $true)]
+        [String] $fslogixStorageAccountKey,
+
+        [Parameter(Mandatory = $true)]
+        [String[]]$VHDLocations
+    )
+
+    # Get first $VHDLocations entry and extract fileServer from it
+    # $VHDLocations is expected to be like: "\\<storageaccount>.file.core.windows.net\<sharename>"
+    # $fileServer will be "<storageaccount>.file.core.windows.net"
+    $fileServer = ($VHDLocations[0] -split '\\')[2].Trim()
+    
+    # Extract storage account name from file server
+    $storageAccount = ($fileServer -split '\.')[0].Trim()
+
+    
+    $user = "localhost\$($storageAccount)"
 
     # Include credentials in the profile
     Registry AzureADAccount-LoadCredKeyFromProfile {
@@ -262,7 +271,7 @@ Configuration ConfigureFSLogix {
                     throw "cmdkey failed with exit code $($proc.ExitCode)"
                 }
 
-                Write-Debug "cmdkey executed successfully."
+                Write-Host "cmdkey executed successfully."
             }
             finally {
                 Write-Host "Finished processing cmdkey entry for $target"
@@ -280,6 +289,7 @@ Configuration ConfigureFSLogix {
     #     ValueType = 'Dword'
     #     ValueData = '0'
     # }
+
 }
 
 
@@ -376,15 +386,26 @@ Configuration PrepareAvdHost
             $finalDependsOn = '[InstallAVDAgent]InstallAVDAgent'
         }
 
-        ConfigureFSLogix ConfigureFSLogix {
-            fslogixStorageAccountKey = $fslogixStorageAccountKey
-            ProfileSizeMB            = $ProfileSizeMB
-            VHDLocations             = $VHDLocations
-            FSLExcludedMembers       = $FSLExcludedMembers
-            DependsOn                = $finalDependsOn
+        if ($null -ne $ProfileSizeMB) {
+            ConfigureFSLogix ConfigureFSLogix {
+                ProfileSizeMB      = $ProfileSizeMB
+                VHDLocations       = $VHDLocations
+                FSLExcludedMembers = $FSLExcludedMembers
+                DependsOn          = $finalDependsOn
+            }
+
+            $finalDependsOn = '[ConfigureFSLogix]ConfigureFSLogix'
         }
 
-        $finalDependsOn = '[ConfigureFSLogix]ConfigureFSLogix'
+        if ($null -ne $fslogixStorageAccountKey) {
+            ConfigureFSLogixKey ConfigureFSLogixKey {
+                fslogixStorageAccountKey = $fslogixStorageAccountKey
+                VHDLocations             = $VHDLocations
+                DependsOn                = $finalDependsOn
+            }
+
+            $finalDependsOn = '[ConfigureFSLogixKey]ConfigureFSLogixKey'
+        }
 
         if ($withGPU) {
             ConfigureGPU ConfigureGPU {
