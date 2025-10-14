@@ -386,7 +386,7 @@ Configuration PrepareAvdHost
             $finalDependsOn = '[InstallAVDAgent]InstallAVDAgent'
         }
 
-        if ($null -ne $ProfileSizeMB) {
+        if ($null -ne $ProfileSizeMB -and $ProfileSizeMB -gt 0) {
             ConfigureFSLogix ConfigureFSLogix {
                 ProfileSizeMB      = $ProfileSizeMB
                 VHDLocations       = $VHDLocations
