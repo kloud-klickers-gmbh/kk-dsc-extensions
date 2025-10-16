@@ -281,14 +281,14 @@ Configuration ConfigureFSLogixKey {
         }
     }
 
-    # Disable Windows Defender Credential Guard (only needed for Windows 11 22H2)
-    # Registry AzureADAccount-LoadCredKeyFromProfile {
-    #     Ensure    = 'Present'
-    #     Key       = 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa'
-    #     ValueName = 'LsaCfgFlags'
-    #     ValueType = 'Dword'
-    #     ValueData = '0'
-    # }
+    # Disable Windows Defender Credential Guard (only needed for Windows 11 22H2 and 25H2(?))
+    Registry AzureADAccount-LoadCredKeyFromProfile {
+        Ensure    = 'Present'
+        Key       = 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa'
+        ValueName = 'LsaCfgFlags'
+        ValueType = 'Dword'
+        ValueData = '0'
+    }
 
 }
 
