@@ -1,0 +1,32 @@
+# Azure Machine Configuration - Build and Temp Files
+*.zip
+*.mof
+*.checksum
+temp/
+tmp/
+
+# PowerShell
+*.ps1xml
+*_profile.ps1
+
+# Logs
+*.log
+*.txt
+
+# Azure
+*.publishsettings
+
+# IDE
+.vscode/
+.vs/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Package outputs
+packages/
+build/
+dist/

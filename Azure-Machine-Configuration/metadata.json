@@ -1,0 +1,109 @@
+{
+    "Name": "AVDHostConfiguration",
+    "Version": "1.0.0",
+    "Description": "Azure Machine Configuration for AVD Host setup - migrated from DSC Extension",
+    "Author": "Kloud Klickers GmbH",
+    "CompanyName": "Kloud Klickers GmbH",
+    "Copyright": "© 2024 Kloud Klickers GmbH. All rights reserved.",
+    "RequiredModules": [
+        "PSDscResources"
+    ],
+    "Configurations": [
+        {
+            "Name": "AVDHostConfiguration",
+            "Description": "Complete AVD host configuration including FSLogix, GPU settings, and storage access",
+            "Parameters": [
+                {
+                    "Name": "EnableGPU",
+                    "Type": "bool",
+                    "Required": false,
+                    "Description": "Enable GPU acceleration settings for RDS/AVD"
+                },
+                {
+                    "Name": "StorageAccountKey",
+                    "Type": "string",
+                    "Required": false,
+                    "Description": "Storage account key for FSLogix profile access"
+                },
+                {
+                    "Name": "ProfileSizeMB",
+                    "Type": "int",
+                    "Required": false,
+                    "Description": "FSLogix profile container size in megabytes"
+                },
+                {
+                    "Name": "VHDLocations",
+                    "Type": "string[]",
+                    "Required": false,
+                    "Description": "Array of UNC paths for FSLogix profile storage locations"
+                },
+                {
+                    "Name": "FSLExcludedMembers",
+                    "Type": "string[]",
+                    "Required": false,
+                    "Description": "Array of users/groups to exclude from FSLogix profiles"
+                }
+            ]
+        },
+        {
+            "Name": "FSLogixConfiguration",
+            "Description": "FSLogix profile configuration only",
+            "Parameters": [
+                {
+                    "Name": "ProfileSizeMB",
+                    "Type": "int",
+                    "Required": true,
+                    "Description": "FSLogix profile container size in megabytes"
+                },
+                {
+                    "Name": "VHDLocations",
+                    "Type": "string[]",
+                    "Required": true,
+                    "Description": "Array of UNC paths for FSLogix profile storage locations"
+                },
+                {
+                    "Name": "FSLExcludedMembers",
+                    "Type": "string[]",
+                    "Required": true,
+                    "Description": "Array of users/groups to exclude from FSLogix profiles"
+                }
+            ]
+        },
+        {
+            "Name": "GPUConfiguration",
+            "Description": "GPU acceleration settings for RDS/AVD",
+            "Parameters": []
+        },
+        {
+            "Name": "StorageAccountAccess",
+            "Description": "Configure storage account access credentials",
+            "Parameters": [
+                {
+                    "Name": "StorageAccountKey",
+                    "Type": "string",
+                    "Required": true,
+                    "Description": "Storage account key for profile access"
+                },
+                {
+                    "Name": "VHDLocations",
+                    "Type": "string[]",
+                    "Required": true,
+                    "Description": "Array of UNC paths for FSLogix profile storage locations"
+                }
+            ]
+        }
+    ],
+    "MigrationNotes": {
+        "RemovedFunctionality": [
+            "AVD Agent Installation - Use Azure VM Extension or custom script extension instead",
+            "Domain Join - Use Azure AD Join or Hybrid Join via Intune/ARM templates",
+            "Reboot handling - Managed by Azure Machine Configuration automatically"
+        ],
+        "NewFeatures": [
+            "Policy-based enforcement via Azure Policy",
+            "Compliance reporting and monitoring",
+            "Drift detection and automatic remediation",
+            "Support for both Windows and Linux (extensible)"
+        ]
+    }
+}
