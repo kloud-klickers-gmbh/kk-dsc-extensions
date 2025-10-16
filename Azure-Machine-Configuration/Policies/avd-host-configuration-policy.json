@@ -1,0 +1,220 @@
+{
+    "properties": {
+        "displayName": "Configure AVD hosts with FSLogix and GPU settings",
+        "description": "This policy ensures that AVD hosts are properly configured with FSLogix profiles and GPU acceleration settings using Azure Machine Configuration.",
+        "policyType": "Custom",
+        "mode": "Indexed",
+        "metadata": {
+            "version": "1.0.0",
+            "category": "Guest Configuration",
+            "requiredProviders": [
+                "Microsoft.GuestConfiguration"
+            ]
+        },
+        "parameters": {
+            "IncludeArcMachines": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Include Arc connected servers",
+                    "description": "By selecting this option, you agree to be charged monthly per Arc connected machine."
+                },
+                "allowedValues": [
+                    "true",
+                    "false"
+                ],
+                "defaultValue": "false"
+            },
+            "EnableGPU": {
+                "type": "Boolean",
+                "metadata": {
+                    "displayName": "Enable GPU acceleration",
+                    "description": "Configure GPU acceleration settings for RDS/AVD hosts"
+                },
+                "defaultValue": false
+            },
+            "ProfileSizeMB": {
+                "type": "Integer",
+                "metadata": {
+                    "displayName": "FSLogix profile size (MB)",
+                    "description": "Maximum size for FSLogix profile containers in megabytes"
+                },
+                "defaultValue": 30720
+            },
+            "VHDLocations": {
+                "type": "Array",
+                "metadata": {
+                    "displayName": "FSLogix VHD storage locations",
+                    "description": "Array of UNC paths where FSLogix profiles will be stored"
+                },
+                "defaultValue": []
+            },
+            "FSLExcludedMembers": {
+                "type": "Array",
+                "metadata": {
+                    "displayName": "FSLogix excluded members",
+                    "description": "Array of users or groups to exclude from FSLogix profiles"
+                },
+                "defaultValue": [
+                    "Domain Admins",
+                    "Enterprise Admins"
+                ]
+            }
+        },
+        "policyRule": {
+            "if": {
+                "anyOf": [
+                    {
+                        "allOf": [
+                            {
+                                "field": "type",
+                                "equals": "Microsoft.Compute/virtualMachines"
+                            },
+                            {
+                                "anyOf": [
+                                    {
+                                        "field": "Microsoft.Compute/imagePublisher",
+                                        "in": [
+                                            "MicrosoftWindowsDesktop",
+                                            "MicrosoftWindowsServer"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "value": "[parameters('IncludeArcMachines')]",
+                                "equals": "true"
+                            },
+                            {
+                                "field": "type",
+                                "equals": "Microsoft.HybridCompute/machines"
+                            },
+                            {
+                                "field": "Microsoft.HybridCompute/machines/osName",
+                                "like": "windows*"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "then": {
+                "effect": "auditIfNotExists",
+                "details": {
+                    "type": "Microsoft.GuestConfiguration/guestConfigurationAssignments",
+                    "name": "AVDHostConfiguration",
+                    "existenceCondition": {
+                        "allOf": [
+                            {
+                                "field": "Microsoft.GuestConfiguration/guestConfigurationAssignments/complianceStatus",
+                                "equals": "Compliant"
+                            },
+                            {
+                                "field": "Microsoft.GuestConfiguration/guestConfigurationAssignments/parameterHash",
+                                "equals": "[base64(concat('EnableGPU=', parameters('EnableGPU'), ';ProfileSizeMB=', parameters('ProfileSizeMB'), ';VHDLocations=', string(parameters('VHDLocations')), ';FSLExcludedMembers=', string(parameters('FSLExcludedMembers'))))]"
+                            }
+                        ]
+                    },
+                    "deployment": {
+                        "properties": {
+                            "mode": "incremental",
+                            "parameters": {
+                                "vmName": {
+                                    "value": "[field('name')]"
+                                },
+                                "location": {
+                                    "value": "[field('location')]"
+                                },
+                                "type": {
+                                    "value": "[field('type')]"
+                                },
+                                "configurationName": {
+                                    "value": "AVDHostConfiguration"
+                                },
+                                "EnableGPU": {
+                                    "value": "[parameters('EnableGPU')]"
+                                },
+                                "ProfileSizeMB": {
+                                    "value": "[parameters('ProfileSizeMB')]"
+                                },
+                                "VHDLocations": {
+                                    "value": "[parameters('VHDLocations')]"
+                                },
+                                "FSLExcludedMembers": {
+                                    "value": "[parameters('FSLExcludedMembers')]"
+                                }
+                            },
+                            "template": {
+                                "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+                                "contentVersion": "1.0.0.0",
+                                "parameters": {
+                                    "vmName": {
+                                        "type": "string"
+                                    },
+                                    "location": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "configurationName": {
+                                        "type": "string"
+                                    },
+                                    "EnableGPU": {
+                                        "type": "bool"
+                                    },
+                                    "ProfileSizeMB": {
+                                        "type": "int"
+                                    },
+                                    "VHDLocations": {
+                                        "type": "array"
+                                    },
+                                    "FSLExcludedMembers": {
+                                        "type": "array"
+                                    }
+                                },
+                                "resources": [
+                                    {
+                                        "apiVersion": "2020-06-25",
+                                        "type": "Microsoft.Compute/virtualMachines/providers/guestConfigurationAssignments",
+                                        "name": "[concat(parameters('vmName'), '/Microsoft.GuestConfiguration/', parameters('configurationName'))]",
+                                        "location": "[parameters('location')]",
+                                        "properties": {
+                                            "guestConfiguration": {
+                                                "name": "[parameters('configurationName')]",
+                                                "contentUri": "https://github.com/kloud-klickers-gmbh/kk-dsc-extensions/releases/download/v1.0.0/AVDHostConfiguration.zip",
+                                                "contentHash": "TBD",
+                                                "version": "1.0.0",
+                                                "assignmentType": "ApplyAndMonitor",
+                                                "configurationParameter": [
+                                                    {
+                                                        "name": "EnableGPU",
+                                                        "value": "[string(parameters('EnableGPU'))]"
+                                                    },
+                                                    {
+                                                        "name": "ProfileSizeMB",
+                                                        "value": "[string(parameters('ProfileSizeMB'))]"
+                                                    },
+                                                    {
+                                                        "name": "VHDLocations",
+                                                        "value": "[string(parameters('VHDLocations'))]"
+                                                    },
+                                                    {
+                                                        "name": "FSLExcludedMembers",
+                                                        "value": "[string(parameters('FSLExcludedMembers'))]"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

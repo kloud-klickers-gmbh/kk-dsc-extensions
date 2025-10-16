@@ -1,0 +1,78 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata": {
+        "description": "ARM Template for AVD Agent Installation using Custom Script Extension. This template replaces the AVD Agent installation functionality from the original DSC configuration."
+    },
+    "parameters": {
+        "vmName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Virtual Machine"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources"
+            }
+        },
+        "avdRegistrationToken": {
+            "type": "securestring",
+            "metadata": {
+                "description": "AVD Host Pool registration token"
+            }
+        },
+        "scriptUri": {
+            "type": "string",
+            "defaultValue": "https://raw.githubusercontent.com/kloud-klickers-gmbh/kk-dsc-extensions/main/Azure-Machine-Configuration/Scripts/Install-AVDAgent.ps1",
+            "metadata": {
+                "description": "URI to the AVD Agent installation script"
+            }
+        },
+        "timestamp": {
+            "type": "string",
+            "defaultValue": "[utcNow()]",
+            "metadata": {
+                "description": "Timestamp to force extension update"
+            }
+        }
+    },
+    "variables": {
+        "extensionName": "InstallAVDAgent"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2021-11-01",
+            "name": "[concat(parameters('vmName'), '/', variables('extensionName'))]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.10",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "timestamp": "[parameters('timestamp')]"
+                },
+                "protectedSettings": {
+                    "fileUris": [
+                        "[parameters('scriptUri')]"
+                    ],
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File Install-AVDAgent.ps1 -AvdRegistrationToken \"', parameters('avdRegistrationToken'), '\"')]"
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "extensionName": {
+            "type": "string",
+            "value": "[variables('extensionName')]"
+        },
+        "vmName": {
+            "type": "string",
+            "value": "[parameters('vmName')]"
+        }
+    }
+}
