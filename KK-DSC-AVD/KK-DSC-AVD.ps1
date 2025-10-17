@@ -362,9 +362,9 @@ Configuration PrepareAvdHost
         [System.Management.Automation.PSCredential]
         $JoinCredential = $null
     )
-    
-    Import-DscResource -ModuleName 'xDSCDomainjoin'
-    Import-DscResource -ModuleName 'xPendingReboot'
+
+    Import-DscResource -ModuleName @{ModuleName = 'xDSCDomainjoin'; RequiredVersion = '1.2.23'}
+    Import-DscResource -ModuleName @{ModuleName = 'xPendingReboot'; RequiredVersion = '0.4.0.0'}
 
     Node localhost
     {
