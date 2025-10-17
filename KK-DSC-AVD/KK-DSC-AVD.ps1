@@ -363,8 +363,10 @@ Configuration PrepareAvdHost
         $JoinCredential = $null
     )
 
-    Import-DscResource -ModuleName @{ModuleName = 'xDSCDomainjoin'; RequiredVersion = '1.2.23'}
-    Import-DscResource -ModuleName @{ModuleName = 'xPendingReboot'; RequiredVersion = '0.4.0.0'}
+    # Explicitly import required module versions to avoid ambiguity when multiple versions are present on the system
+    # Use FullyQualifiedName syntax recommended by Get-Module -ListAvailable -FullyQualifiedName
+    Import-DscResource -ModuleName @{ModuleName = 'xDSCDomainjoin'; ModuleVersion = '1.2.23'}
+    Import-DscResource -ModuleName @{ModuleName = 'xPendingReboot'; ModuleVersion = '0.4.0.0'}
 
     Node localhost
     {
