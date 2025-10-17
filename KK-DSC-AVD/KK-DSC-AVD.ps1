@@ -100,19 +100,6 @@ Configuration InstallAVDAgent {
 }
 
 Configuration ConfigureFSLogix {
-
-    param(
-        [Parameter(Mandatory = $true)]
-        [Int]$ProfileSizeMB,
-
-        [Parameter(Mandatory = $true)]
-        [String[]]$VHDLocations,
-
-        [Parameter(Mandatory = $true)]
-        [String[]]$FSLExcludedMembers
-    )
-
-
     Registry FSLPropertiesReg-Enabled {
         Ensure    = 'Present'
         Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
@@ -120,16 +107,6 @@ Configuration ConfigureFSLogix {
         ValueType = 'Dword'
         ValueData = '1'
     }
-
-    # $VHDLocations is expected to be like: "\\<storageaccount>.file.core.windows.net\<sharename>"
-    Registry FSLPropertiesReg-VHDLocations {
-        Ensure    = 'Present'
-        Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
-        ValueName = 'VHDLocations'
-        ValueType = 'MultiString'
-        ValueData = $VHDLocations
-    }
-
     Registry FSLPropertiesReg-ConcurrentUserSessions {
         Ensure    = 'Present'
         Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
@@ -172,13 +149,6 @@ Configuration ConfigureFSLogix {
         ValueType = 'Dword'
         ValueData = '0'
     }
-    Registry FSLPropertiesReg-SizeInMBs {
-        Ensure    = 'Present'
-        Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
-        ValueName = 'SizeInMBs'
-        ValueType = 'Dword'
-        ValueData = $ProfileSizeMB
-    }
     Registry FSLPropertiesReg-VolumeType {
         Ensure    = 'Present'
         Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
@@ -199,6 +169,36 @@ Configuration ConfigureFSLogix {
         ValueName = 'PreventLoginWithTempProfile'
         ValueType = 'Dword'
         ValueData = '1'
+    }
+}
+
+Configuration ConfigureFSLogixSettings {
+
+    param(
+        [Parameter(Mandatory = $true)]
+        [Int]$ProfileSizeMB,
+
+        [Parameter(Mandatory = $true)]
+        [String[]]$VHDLocations,
+
+        [Parameter(Mandatory = $true)]
+        [String[]]$FSLExcludedMembers
+    )
+
+    # $VHDLocations is expected to be like: "\\<storageaccount>.file.core.windows.net\<sharename>"
+    Registry FSLPropertiesReg-VHDLocations {
+        Ensure    = 'Present'
+        Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
+        ValueName = 'VHDLocations'
+        ValueType = 'MultiString'
+        ValueData = $VHDLocations
+    }
+    Registry FSLPropertiesReg-SizeInMBs {
+        Ensure    = 'Present'
+        Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
+        ValueName = 'SizeInMBs'
+        ValueType = 'Dword'
+        ValueData = $ProfileSizeMB
     }
     
     Group FSLExclude {
@@ -386,15 +386,20 @@ Configuration PrepareAvdHost
             $finalDependsOn = '[InstallAVDAgent]InstallAVDAgent'
         }
 
+        ConfigureFSLogix ConfigureFSLogix {
+            DependsOn = $finalDependsOn
+        }
+        $finalDependsOn = '[ConfigureFSLogix]ConfigureFSLogix'
+
         if ($null -ne $ProfileSizeMB -and $ProfileSizeMB -gt 0) {
-            ConfigureFSLogix ConfigureFSLogix {
+            ConfigureFSLogixSettings ConfigureFSLogixSettings {
                 ProfileSizeMB      = $ProfileSizeMB
                 VHDLocations       = $VHDLocations
                 FSLExcludedMembers = $FSLExcludedMembers
                 DependsOn          = $finalDependsOn
             }
 
-            $finalDependsOn = '[ConfigureFSLogix]ConfigureFSLogix'
+            $finalDependsOn = '[ConfigureFSLogixSettings]ConfigureFSLogixSettings'
         }
 
         if ($null -ne $fslogixStorageAccountKey) {
