@@ -256,11 +256,8 @@ Configuration ConfigureFSLogixKey {
         }
 
         TestScript = {
-            $target = $using:fileServer
-            # cmdkey lists entries like: "Target: domain:TERMSRV/fileserver"
-            # We'll just check for the target string in cmdkey output
-            $list = & cmdkey.exe /list 2>&1 | Out-String
-            return $list -match [regex]::Escape($target)
+            # Do NOT check if key exists. If the key exists but with wrong value, it will cause FSLogix profile load failure. Always return false to ensure the key is set with correct value.
+            return $false
         }
 
         SetScript  = {
