@@ -98,6 +98,11 @@ Configuration InstallAVDAgent {
 }
 
 Configuration ConfigureFSLogix {
+
+    param (
+        [bool]$entraOnly = $false
+    )
+
     Registry FSLPropertiesReg-Enabled {
         Ensure    = 'Present'
         Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
@@ -169,13 +174,15 @@ Configuration ConfigureFSLogix {
         ValueData = '1'
     }
 
-    # Enable Microsoft Entra Kerberos Ticket Retrieval for cloud only (Needed for Azure Files + future FSLogix in AVD scenarios)
-    Registry CloudKerberosTicketRetrievalEnabled {
-        Ensure    = 'Present'
-        Key       = 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\Kerberos\Parameters'
-        ValueName = 'CloudKerberosTicketRetrievalEnabled'
-        ValueType = 'Dword'
-        ValueData = '1'
+    if($entraOnly -eq $true) {
+        # Enable Microsoft Entra Kerberos Ticket Retrieval for cloud only (Needed for Azure Files + future FSLogix in AVD scenarios)
+        Registry CloudKerberosTicketRetrievalEnabled {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\Kerberos\Parameters'
+            ValueName = 'CloudKerberosTicketRetrievalEnabled'
+            ValueType = 'Dword'
+            ValueData = '1'
+        }
     }
 }
 
@@ -393,6 +400,7 @@ Configuration PrepareAvdHost
         }
 
         ConfigureFSLogix ConfigureFSLogix {
+            entraOnly = $entraOnly
             DependsOn = $finalDependsOn
         }
         $finalDependsOn = '[ConfigureFSLogix]ConfigureFSLogix'
