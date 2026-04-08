@@ -399,6 +399,21 @@ Configuration PrepareAvdHost
             $finalDependsOn = '[InstallAVDAgent]InstallAVDAgent'
         }
 
+        if ($entraOnly -eq $false) {
+            xDSCDomainjoin JoinDomain {
+                DependsOn  = $finalDependsOn
+                Domain     = $joindomain
+                JoinOU     = $joinou
+                Credential = $JoinCredential
+            }
+            xPendingReboot RebootDomJoin {
+                Name      = 'DomJoinReboot'
+                DependsOn = '[xDSCDomainjoin]JoinDomain'
+            }
+
+            $finalDependsOn = '[xPendingReboot]RebootDomJoin'
+        }
+
         ConfigureFSLogix ConfigureFSLogix {
             entraOnly = $entraOnly
             DependsOn = $finalDependsOn
@@ -432,19 +447,6 @@ Configuration PrepareAvdHost
             }
 
             $finalDependsOn = '[ConfigureGPU]ConfigureGPU'
-        }
-        
-        if ($entraOnly -eq $false) {
-            xDSCDomainjoin JoinDomain {
-                DependsOn  = $finalDependsOn
-                Domain     = $joindomain
-                JoinOU     = $joinou
-                Credential = $JoinCredential
-            }
-            xPendingReboot RebootDomJoin {
-                Name      = 'DomJoinReboot'
-                DependsOn = '[xDSCDomainjoin]JoinDomain'
-            }
         }
         
         LocalConfigurationManager {
